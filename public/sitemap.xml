@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://yourdomain.com/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://yourdomain.com/?tool=ai-ui-generator</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://yourdomain.com/?tool=screenshot-to-code</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://yourdomain.com/?tool=prompt-benchmarker</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://yourdomain.com/?tool=json-to-typescript</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://yourdomain.com/?tool=curl-to-code</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://yourdomain.com/?tool=ai-sql-generator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://yourdomain.com/?tool=jwt-decoder</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://yourdomain.com/?tool=regex-generator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://yourdomain.com/?tool=error-explainer</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://yourdomain.com/?tool=readme-generator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://yourdomain.com/?tool=cron-expression</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://yourdomain.com/?tool=svg-optimizer</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+</urlset>

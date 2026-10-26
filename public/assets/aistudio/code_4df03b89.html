@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"surface-container-low":"#1a1b21","primary-fixed-dim":"#c0c1ff","primary-fixed":"#e1e0ff","on-primary":"#1000a9","primary-container":"#8083ff","on-secondary-container":"#00311f","surface-container-lowest":"#0d0e13","tertiary-fixed":"#ffddb8","on-tertiary-fixed":"#2a1700","secondary-container":"#00a572","on-tertiary-fixed-variant":"#653e00","on-surface-variant":"#c7c4d7","on-secondary-fixed":"#002113","secondary-fixed":"#6ffbbe","tertiary-fixed-dim":"#ffb95f","tertiary-container":"#ca8100","surface-tint":"#c0c1ff","inverse-on-surface":"#2f3036","outline":"#908fa0","primary":"#c0c1ff","on-tertiary-container":"#3e2400","inverse-surface":"#e3e1e9","on-background":"#e3e1e9","on-tertiary":"#472a00","on-surface":"#e3e1e9","on-error-container":"#ffdad6","surface-container-high":"#292a2f","on-secondary":"#003824","tertiary":"#ffb95f","surface-container-highest":"#34343a","secondary-fixed-dim":"#4edea3","surface-container":"#1e1f25","on-secondary-fixed-variant":"#005236","outline-variant":"#464554","error-container":"#93000a","surface-variant":"#34343a","secondary":"#4edea3","on-primary-fixed":"#07006c","surface":"#121318","on-primary-container":"#0d0096","surface-bright":"#38393f","error":"#ffb4ab","surface-dim":"#121318","inverse-primary":"#494bd6","on-primary-fixed-variant":"#2f2ebe","background":"#121318","on-error":"#690005"},borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},spacing:{"space-xs":"0.25rem","space-md":"0.75rem","space-xl":"2rem","margin":"1rem","gutter-desktop":"1rem","margin-desktop":"1.5rem","space-sm":"0.5rem","space-lg":"1.25rem","gutter":"0.75rem"},fontFamily:{"headline-xl-mobile":["Geist"],"headline-lg":["Geist"],"label-ui":["Geist"],"headline-xl":["Geist"],"headline-md":["Geist"],"headline-lg-mobile":["Geist"],"body-lg":["Geist"],"label-code-sm":["JetBrains Mono"],"label-code-lg":["JetBrains Mono"],"body-sm":["Geist"],"label-code-md":["JetBrains Mono"],"body-md":["Geist"]},fontSize:{"headline-xl-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"label-ui":["11px",{"lineHeight":"16px","letterSpacing":"0.04em","fontWeight":"600"}],"headline-xl":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-md":["18px",{"lineHeight":"26px","letterSpacing":"-0.01em","fontWeight":"500"}],"headline-lg-mobile":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-lg":["15px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"400"}],"label-code-sm":["11px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"500"}],"label-code-lg":["13px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"18px","letterSpacing":"0em","fontWeight":"400"}],"label-code-md":["12px",{"lineHeight":"18px","letterSpacing":"0em","fontWeight":"400"}],"body-md":["13px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="h-14 w-full px-margin-desktop flex items-center justify-between gap-gutter"><div class="flex items-center gap-space-md shrink-0"><img alt="DevPulse AI Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1U1aldFgYWGxDdMNxsDrJvamoOW30Pnv2iFosPciaTXE39Fq3vATttQFVrxU8lQ1isA39KgueYqXWxhVk115Nfypm-MdscneLh1LUeFwaDwJ_HdKqKLzjJygBNery-gHAk6WE3ROxWf0m9pfd7Te5pKM9l3axqboar03g6Mlat8dGhV31mbleQFzSxoSzOGTO4ObLb3L1xIxCTVBP6eD60PxhBogkW7MLnp96f7c0xOpys1kkqg8LvZyg"/><div class="flex items-center gap-space-sm"><span class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight">DevPulse AI</span><div class="flex items-center gap-space-xs bg-surface-container px-space-sm py-0.5 rounded-full"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span></span><span class="font-label-code-sm text-label-code-sm text-secondary-fixed-dim whitespace-nowrap hidden sm:inline">Local Session Active (Saved in Browser)</span></div><span class="font-label-code-sm text-label-code-sm bg-surface-container-high text-on-surface-variant px-space-xs py-0.5 rounded">v2.5</span></div></div><nav class="hidden xl:flex items-center bg-surface-container-low p-space-xs rounded-lg gap-space-xs" data-active-classes="bg-surface-container-highest text-on-surface font-semibold"><a aria-current="page" class="px-space-md py-space-xs rounded transition-all bg-surface-container-highest text-on-surface font-semibold" data-path="artifact-sandbox" href="#">Artifact Sandbox</a><a class="px-space-md py-space-xs rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-ui text-label-ui transition-all" data-path="prompt-benchmarker" href="#">Prompt Benchmarker</a><a class="px-space-md py-space-xs rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-ui text-label-ui transition-all" data-path="dev-utilities" href="#">Dev Utilities</a></nav><div class="flex items-center gap-space-sm shrink-0"><div class="relative hidden lg:block"><select class="appearance-none bg-surface-container-low text-on-surface font-label-code-sm text-label-code-sm pl-space-md pr-space-xl py-space-xs rounded focus:outline-none cursor-pointer hover:bg-surface-container-high transition-colors"><option value="gemini-3.8-flash">Gemini 3.8 Flash (Free Auto-Rotator)</option><option value="groq-llama-70b">Groq Llama 3.3 70B</option><option value="gemini-4-argon">Gemini 4 Argon (🔑 BYOK Pro)</option></select><span class="material-symbols-outlined absolute right-space-xs top-1/2 -translate-y-1/2 pointer-events-none text-outline text-[16px]">expand_more</span></div><button class="flex items-center gap-space-xs bg-surface-container-high text-on-surface hover:bg-surface-bright hover:text-on-surface px-space-sm py-space-xs rounded font-label-code-sm text-label-code-sm transition-all" type="button"><span class="material-symbols-outlined text-[14px] text-primary">key</span><span class="hidden md:inline">BYOK Settings</span></button><button class="flex items-center gap-space-xs bg-tertiary-container text-on-tertiary-container hover:bg-tertiary hover:text-on-tertiary px-space-sm py-space-xs rounded font-label-ui text-label-ui transition-all" type="button"><span class="material-symbols-outlined text-[15px]">local_cafe</span><span class="hidden sm:inline">Buy Coffee</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-14 bg-surface flex-1 flex flex-col"><div class="flex flex-col w-full text-on-surface">
+<!-- TOP WORKSPACE SUB-BAR WITH PRIMARY TABS & WORKSPACE STATUS -->
+<div class="w-full bg-surface-container-lowest px-margin-desktop py-space-xs flex flex-wrap items-center justify-between gap-space-sm shadow-sm">
+<div class="flex items-center gap-space-xs">
+<button class="main-view-tab px-space-md py-space-xs rounded font-label-ui text-label-ui flex items-center gap-space-xs transition-all bg-surface-container-highest text-on-surface" id="viewTab-sandbox" onclick="switchMainView('sandbox')">
+<span class="material-symbols-outlined text-[16px] text-primary">bolt</span>
+<span>Artifact Sandbox</span>
+<span class="bg-primary/20 text-primary px-space-xs rounded text-[9px] font-label-code-sm">LIVE</span>
+</button>
+<button class="main-view-tab px-space-md py-space-xs rounded font-label-ui text-label-ui flex items-center gap-space-xs transition-all text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface" id="viewTab-benchmarker" onclick="switchMainView('benchmarker')">
+<span class="material-symbols-outlined text-[16px]">science</span>
+<span>Prompt Benchmarker</span>
+<span class="bg-secondary/15 text-secondary px-space-xs rounded text-[9px] font-label-code-sm">3 LLMs</span>
+</button>
+<button class="main-view-tab px-space-md py-space-xs rounded font-label-ui text-label-ui flex items-center gap-space-xs transition-all text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface" id="viewTab-utilities" onclick="switchMainView('utilities')">
+<span class="material-symbols-outlined text-[16px]">build_circle</span>
+<span>Dev Utilities</span>
+<span class="bg-tertiary/15 text-tertiary px-space-xs rounded text-[9px] font-label-code-sm">Toolbox</span>
+</button>
+</div>
+<!-- Quick Micro Telemetry Pill -->
+<div class="hidden md:flex items-center gap-space-md font-label-code-sm text-label-code-sm text-on-surface-variant">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span>Runtime: Sandboxed WebWorker v24.1</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[14px] text-outline">memory</span>
+<span>Heap: 38.4 MB / 512 MB</span>
+</div>
+<button class="text-primary hover:text-primary-fixed flex items-center gap-space-xs transition-colors" onclick="openModal('byok-modal')">
+<span class="material-symbols-outlined text-[13px]">tune</span>
+<span>Key Manager</span>
+</button>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- VIEW 1: ARTIFACT SANDBOX (DEFAULT ACTIVE)                                 -->
+<!-- ========================================================================= -->
+<div class="main-view-content flex flex-col xl:flex-row w-full min-h-[calc(100vh-7rem)] bg-surface" id="view-sandbox">
+<!-- LEFT PANE: Editor & AI Prompt (46%) -->
+<div class="w-full xl:w-[46%] flex flex-col bg-surface-container-low shrink-0">
+<!-- Top AI Prompt Bar -->
+<div class="p-space-md bg-surface-container-low flex flex-col gap-space-sm shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px]">auto_awesome</span>
+<span class="font-label-ui text-label-ui uppercase tracking-wider text-on-surface font-semibold">AI Synthesis Prompt</span>
+</div>
+<span class="font-label-code-sm text-label-code-sm text-outline">Press <kbd class="px-space-xs py-0.5 rounded bg-surface-container-highest text-on-surface text-[10px]">⌘ Enter</kbd> to run</span>
+</div>
+<div class="relative flex items-center">
+<input class="w-full h-10 bg-surface-container-lowest text-on-surface pl-space-md pr-28 rounded font-body-sm text-body-sm focus:outline-none focus:ring-1 focus:ring-primary shadow-inner" id="prompt-input" placeholder="Describe a UI component, React app, or Python script..." type="text" value="Build a high-converting obsidian dark mode SaaS Pricing Table with tiered switches"/>
+<button class="absolute right-1 px-space-md h-8 rounded bg-primary text-on-primary font-label-ui text-label-ui flex items-center gap-space-xs hover:bg-primary-container hover:text-on-primary-container transition-all shadow-md" id="generate-btn" onclick="simulateAIGeneration()">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+<span>Generate UI</span>
+</button>
+</div>
+<!-- Quick Starter Chips -->
+<div class="flex items-center gap-space-xs overflow-x-auto pb-1">
+<span class="font-label-code-sm text-label-code-sm text-outline shrink-0">Presets:</span>
+<button class="px-space-sm py-0.5 rounded bg-surface-container text-on-surface-variant hover:bg-surface-container-high hover:text-primary font-label-code-sm text-label-code-sm shrink-0 transition-colors flex items-center gap-space-xs" onclick="injectStarterPreset('pricing')">
+<span>💎</span> SaaS Pricing Table
+          </button>
+<button class="px-space-sm py-0.5 rounded bg-surface-container text-on-surface-variant hover:bg-surface-container-high hover:text-secondary font-label-code-sm text-label-code-sm shrink-0 transition-colors flex items-center gap-space-xs" onclick="injectStarterPreset('crypto')">
+<span>📈</span> Crypto Dashboard
+          </button>
+<button class="px-space-sm py-0.5 rounded bg-surface-container text-on-surface-variant hover:bg-surface-container-high hover:text-tertiary font-label-code-sm text-label-code-sm shrink-0 transition-colors flex items-center gap-space-xs" onclick="injectStarterPreset('pomodoro')">
+<span>⏱️</span> Pomodoro Timer
+          </button>
+</div>
+</div>
+<!-- Code Editor Tab Bar -->
+<div class="flex items-center justify-between px-space-md pt-space-xs bg-surface-container-lowest shadow-sm">
+<div class="flex items-center gap-space-xs">
+<button class="editor-file-tab px-space-md py-space-xs rounded-t font-label-code-sm text-label-code-sm flex items-center gap-space-xs bg-surface-container-low text-primary font-semibold" id="editorTab-html" onclick="switchEditorFile('html')">
+<span class="material-symbols-outlined text-[14px]">html</span>
+<span>index.html</span>
+</button>
+<button class="editor-file-tab px-space-md py-space-xs rounded-t font-label-code-sm text-label-code-sm flex items-center gap-space-xs text-outline hover:text-on-surface hover:bg-surface-container-high" id="editorTab-css" onclick="switchEditorFile('css')">
+<span class="material-symbols-outlined text-[14px]">css</span>
+<span>styles.css</span>
+</button>
+<button class="editor-file-tab px-space-md py-space-xs rounded-t font-label-code-sm text-label-code-sm flex items-center gap-space-xs text-outline hover:text-on-surface hover:bg-surface-container-high" id="editorTab-js" onclick="switchEditorFile('js')">
+<span class="material-symbols-outlined text-[14px]">javascript</span>
+<span>script.js</span>
+</button>
+</div>
+<div class="flex items-center gap-space-sm pb-1">
+<span class="font-label-code-sm text-label-code-sm text-secondary-fixed flex items-center gap-space-xs" id="save-status">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Live Sync
+          </span>
+<button class="p-1 text-outline hover:text-on-surface transition-colors" onclick="formatActiveCode()" title="Prettify Code">
+<span class="material-symbols-outlined text-[16px]">code_blocks</span>
+</button>
+<button class="p-1 text-outline hover:text-error transition-colors" onclick="resetEditorCode()" title="Reset to Template">
+<span class="material-symbols-outlined text-[16px]">restart_alt</span>
+</button>
+</div>
+</div>
+<!-- Editable Code Area with Line Gutter -->
+<div class="relative flex-1 flex bg-surface-container-lowest overflow-hidden min-h-[380px]">
+<!-- Gutter -->
+<div class="w-12 select-none py-space-sm text-right pr-space-sm bg-surface-container-lowest font-label-code-sm text-label-code-sm text-outline-variant leading-[22px] overflow-hidden" id="code-gutter">
+          1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13<br/>14<br/>15<br/>16<br/>17<br/>18<br/>19<br/>20<br/>21<br/>22<br/>23<br/>24<br/>25<br/>26<br/>27<br/>28<br/>29<br/>30
+        </div>
+<!-- Active Code Textarea -->
+<textarea class="flex-1 p-space-sm bg-surface-container-lowest text-on-surface font-label-code-sm text-label-code-sm leading-[22px] focus:outline-none resize-none whitespace-pre overflow-auto scroll-smooth selection:bg-primary-container selection:text-on-primary-container" id="code-editor" spellcheck="false"></textarea>
+</div>
+<!-- Native Sponsored Partner Slot (Raycast/Carbon style) -->
+<div class="p-space-sm bg-surface-container-lowest">
+<div class="p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex items-center justify-between gap-space-md shadow-sm">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-9 h-9 rounded bg-surface-container-highest flex items-center justify-center text-secondary shrink-0 shadow-inner">
+<span class="material-symbols-outlined text-[20px]">database</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-ui text-label-ui text-outline uppercase">Sponsored Partner</span>
+<span class="bg-secondary/15 text-secondary px-space-xs rounded text-[9px] font-label-code-sm">Neon DB</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">
+                Serverless Postgres — Zero cold starts, instant branching & Autoscaling.
+              </p>
+</div>
+</div>
+<a class="px-space-sm py-1 rounded bg-surface-container-high text-on-surface hover:text-primary font-label-code-sm text-label-code-sm whitespace-nowrap shrink-0 transition-colors flex items-center gap-space-xs" href="https://neon.tech" rel="noopener noreferrer" target="_blank">
+<span>Start Free</span>
+<span class="material-symbols-outlined text-[12px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<!-- RIGHT PANE: Live Interactive Preview (54%) -->
+<div class="w-full xl:w-[54%] flex flex-col bg-surface overflow-hidden">
+<!-- Preview Header & Device Switcher Toolbar -->
+<div class="p-space-sm bg-surface-container-low flex flex-wrap items-center justify-between gap-space-sm shadow-sm">
+<!-- Viewport Switcher -->
+<div class="flex items-center bg-surface-container-lowest p-0.5 rounded">
+<button class="vp-btn px-space-sm py-1 rounded font-label-code-sm text-label-code-sm flex items-center gap-space-xs bg-surface-container-high text-on-surface shadow-xs" id="vp-desktop" onclick="setPreviewViewport('100%', this)">
+<span class="material-symbols-outlined text-[14px]">desktop_windows</span>
+<span class="hidden sm:inline">Desktop</span>
+</button>
+<button class="vp-btn px-space-sm py-1 rounded font-label-code-sm text-label-code-sm flex items-center gap-space-xs text-outline hover:text-on-surface" id="vp-tablet" onclick="setPreviewViewport('768px', this)">
+<span class="material-symbols-outlined text-[14px]">tablet_mac</span>
+<span class="hidden sm:inline">Tablet (768)</span>
+</button>
+<button class="vp-btn px-space-sm py-1 rounded font-label-code-sm text-label-code-sm flex items-center gap-space-xs text-outline hover:text-on-surface" id="vp-mobile" onclick="setPreviewViewport('375px', this)">
+<span class="material-symbols-outlined text-[14px]">smartphone</span>
+<span class="hidden sm:inline">Mobile (375)</span>
+</button>
+</div>
+<!-- Mode Toggle (Render vs Raw Console) -->
+<div class="flex items-center bg-surface-container-lowest p-0.5 rounded">
+<button class="mode-btn px-space-sm py-1 rounded font-label-ui text-label-ui flex items-center gap-space-xs bg-surface-container-high text-on-surface" id="mode-render" onclick="togglePreviewMode('render')">
+<span class="material-symbols-outlined text-[14px] text-secondary">visibility</span>
+<span>Live Render</span>
+</button>
+<button class="mode-btn px-space-sm py-1 rounded font-label-ui text-label-ui flex items-center gap-space-xs text-outline hover:text-on-surface" id="mode-console" onclick="togglePreviewMode('console')">
+<span class="material-symbols-outlined text-[14px]">terminal</span>
+<span>Raw Console</span>
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary" id="console-badge"></span>
+</button>
+</div>
+<!-- Actions Toolbar -->
+<div class="flex items-center gap-space-xs">
+<button class="p-space-xs rounded bg-surface-container-highest text-on-surface hover:text-primary transition-colors flex items-center gap-space-xs font-label-code-sm text-label-code-sm" onclick="copyCurrentCode()" title="Copy active code">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span class="hidden md:inline">Copy</span>
+</button>
+<button class="p-space-xs rounded bg-surface-container-highest text-on-surface hover:text-secondary transition-colors flex items-center gap-space-xs font-label-code-sm text-label-code-sm" onclick="shareUrlHash()" title="Share State URL Hash">
+<span class="material-symbols-outlined text-[14px]">share</span>
+<span class="hidden md:inline">Share</span>
+</button>
+<button class="p-space-xs rounded bg-surface-container-highest text-on-surface hover:text-tertiary transition-colors flex items-center gap-space-xs font-label-code-sm text-label-code-sm" onclick="downloadArtifactHtml()" title="Download Single File HTML">
+<span class="material-symbols-outlined text-[14px]">download</span>
+<span class="hidden md:inline">Export</span>
+</button>
+<button class="px-space-sm py-1 rounded bg-surface-container-high text-primary hover:bg-primary hover:text-on-primary transition-all font-label-code-sm text-label-code-sm flex items-center gap-space-xs shadow-sm" onclick="triggerDeployMock()">
+<span class="material-symbols-outlined text-[14px]">rocket_launch</span>
+<span>Deploy Live <span class="opacity-75 text-[10px] hidden lg:inline">($2.99/mo)</span></span>
+</button>
+</div>
+</div>
+<!-- Stylized Browser Frame & URL Pill -->
+<div class="px-space-md py-space-xs bg-surface-container flex items-center gap-space-sm shadow-xs">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-error-container"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary-container"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-secondary-container"></span>
+</div>
+<div class="flex-1 flex items-center justify-center">
+<div class="max-w-md w-full px-space-md py-0.5 rounded-full bg-surface-container-lowest text-center font-label-code-sm text-label-code-sm text-outline flex items-center justify-center gap-space-xs shadow-inner">
+<span class="material-symbols-outlined text-[12px] text-secondary">lock</span>
+<span class="truncate">https://devpulse.local/artifact/preview-8f92a</span>
+<button class="hover:text-on-surface transition-colors" onclick="refreshLiveFrame()" title="Reload Frame">
+<span class="material-symbols-outlined text-[13px]">refresh</span>
+</button>
+</div>
+</div>
+<div class="font-label-code-sm text-[11px] text-outline hidden sm:block">Sandboxed DOM</div>
+</div>
+<!-- Frame Render Container (Center aligned for mobile/tablet simulation) -->
+<div class="flex-1 bg-surface-container-lowest flex items-center justify-center p-space-sm overflow-auto">
+<!-- Render View -->
+<div class="w-full h-full min-h-[520px] transition-all duration-300 flex items-center justify-center" id="preview-wrapper">
+<iframe class="w-full h-full bg-surface rounded shadow-xl" id="live-frame" sandbox="allow-scripts allow-modals"></iframe>
+</div>
+<!-- Raw Simulated Console View (Hidden by default) -->
+<div class="hidden w-full h-full bg-surface-container-lowest p-space-md font-label-code-sm text-label-code-sm flex flex-col justify-between" id="console-view">
+<div class="flex flex-col gap-space-xs font-label-code-sm overflow-auto">
+<div class="text-outline pb-space-xs flex items-center justify-between">
+<span>DevPulse V8 Engine Runtime Console (Simulated)</span>
+<button class="text-outline hover:text-error" onclick="clearConsoleLogs()">Clear</button>
+</div>
+<div class="text-secondary flex items-start gap-space-xs">
+<span class="text-outline">[14:02:11.102]</span>
+<span>[vite:hmr] Hot-reload event dispatched for /index.html</span>
+</div>
+<div class="text-on-surface-variant flex items-start gap-space-xs">
+<span class="text-outline">[14:02:11.109]</span>
+<span>Loaded Tailwind CSS Play CDN (3.4.1) in 48ms</span>
+</div>
+<div class="text-primary flex items-start gap-space-xs">
+<span class="text-outline">[14:02:11.184]</span>
+<span>[DevPulse:Agent] DOM rendered with 0 layout thrashing errors. Interactive elements ready.</span>
+</div>
+<div class="text-tertiary flex items-start gap-space-xs" id="dynamic-console-log">
+<span class="text-outline">[14:02:11.201]</span>
+<span>[State] Plan toggled: Billing frequency set to 'ANNUAL' (20% discount computed).</span>
+</div>
+</div>
+<div class="pt-space-sm flex items-center gap-space-xs text-outline">
+<span>></span>
+<input class="bg-transparent flex-1 text-on-surface focus:outline-none font-label-code-sm text-label-code-sm" onkeydown="handleConsoleInput(event)" placeholder="Evaluate JS expression (e.g. document.title)..." type="text"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- VIEW 2: PROMPT BENCHMARKER (SIDE-BY-SIDE LLM COMPARISON)                 -->
+<!-- ========================================================================= -->
+<div class="main-view-content hidden flex-col w-full p-margin-desktop bg-surface gap-space-lg" id="view-benchmarker">
+<!-- Top Configuration Hero Card -->
+<div class="p-space-lg rounded-xl bg-surface-container-low shadow-md flex flex-col gap-space-md">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+<div>
+<span class="font-label-ui text-label-ui uppercase tracking-wider text-secondary font-semibold">Tri-Model Execution</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mt-0.5">LLM Parallel Benchmarker</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            Evaluate output quality, latency p99, and token acceleration side-by-side using unified deterministic seed zero.
+          </p>
+</div>
+<div class="flex items-center gap-space-xs self-start md:self-auto">
+<button class="px-space-lg py-space-sm rounded bg-primary text-on-primary font-label-ui text-label-ui flex items-center gap-space-xs hover:bg-primary-container hover:text-on-primary-container transition-all shadow-md" id="run-bench-btn" onclick="runParallelBenchmark()">
+<span class="material-symbols-outlined text-[16px]" id="bench-icon">play_arrow</span>
+<span id="bench-btn-text">Run Parallel Benchmark</span>
+</button>
+</div>
+</div>
+<!-- Test Prompt Input Area -->
+<div class="relative">
+<textarea class="w-full h-20 p-space-md bg-surface-container-lowest rounded text-on-surface font-label-code-sm text-label-code-sm leading-relaxed focus:outline-none focus:ring-1 focus:ring-primary shadow-inner resize-none" id="benchmark-prompt">Write a high-performance debounce function in TypeScript with cancel and flush methods, ensuring generic typing preserves function arguments and return values.</textarea>
+</div>
+<!-- Live Benchmarking Telemetry Bar -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-space-sm">
+<div class="p-space-sm rounded bg-surface-container-lowest flex flex-col">
+<span class="font-label-ui text-label-ui text-outline">Active Rotation</span>
+<span class="font-label-code-md text-label-code-md text-on-surface font-semibold">Tier-1 Edge Cluster</span>
+</div>
+<div class="p-space-sm rounded bg-surface-container-lowest flex flex-col">
+<span class="font-label-ui text-label-ui text-outline">Parallel Threads</span>
+<span class="font-label-code-md text-label-code-md text-secondary font-semibold">3 Distinct Providers</span>
+</div>
+<div class="p-space-sm rounded bg-surface-container-lowest flex flex-col">
+<span class="font-label-ui text-label-ui text-outline">Seed / Temperature</span>
+<span class="font-label-code-md text-label-code-md text-on-surface font-semibold">Seed 42 / Temp 0.2</span>
+</div>
+<div class="p-space-sm rounded bg-surface-container-lowest flex flex-col">
+<span class="font-label-ui text-label-ui text-outline">Aggregated Cost</span>
+<span class="font-label-code-md text-label-code-md text-secondary-fixed font-semibold">$0.0000 (Free Tier)</span>
+</div>
+</div>
+</div>
+<!-- 3-Column Side-by-Side Model Comparison Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter-desktop">
+<!-- MODEL 1: Gemini 3.8 Flash -->
+<div class="flex flex-col rounded-xl bg-surface-container-low shadow-md overflow-hidden">
+<!-- Model Header -->
+<div class="p-space-md bg-surface-container flex items-center justify-between shadow-xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></span>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface leading-tight">Gemini 3.8 Flash</h3>
+<span class="font-label-code-sm text-[10px] text-outline">Google DeepMind • Auto-Rotator</span>
+</div>
+</div>
+<span class="bg-primary/15 text-primary px-space-xs py-0.5 rounded font-label-code-sm text-[10px]">Leader in Latency</span>
+</div>
+<!-- Telemetry Chips -->
+<div class="grid grid-cols-3 p-space-sm bg-surface-container-lowest text-center gap-space-xs">
+<div class="flex flex-col">
+<span class="font-label-ui text-[10px] text-outline">SPEED</span>
+<span class="font-label-code-md text-label-code-md text-secondary font-semibold">164 tok/s</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-ui text-[10px] text-outline">TTFT (LATENCY)</span>
+<span class="font-label-code-md text-label-code-md text-primary font-semibold">185 ms</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-ui text-[10px] text-outline">NET COST</span>
+<span class="font-label-code-md text-label-code-md text-secondary-fixed font-semibold">$0.00</span>
+</div>
+</div>
+<!-- Code Block Output -->
+<div class="p-space-md bg-surface-container-lowest flex-1 overflow-auto max-h-[380px] font-label-code-sm text-[12px] leading-[20px] text-on-surface">
+<pre class="text-on-surface-variant font-label-code-sm"><span class="text-primary font-semibold">export interface</span> DebouncedFunction<T <span class="text-primary">extends</span> (...args: <span class="text-secondary">any</span>[]) => <span class="text-secondary">any</span>> {
+  (...args: Parameters<T>): ReturnType<T> | <span class="text-tertiary">undefined</span>;
+  cancel(): <span class="text-tertiary">void</span>;
+  flush(): ReturnType<T> | <span class="text-tertiary">undefined</span>;
+}
+
+<span class="text-primary font-semibold">export function</span> debounce<T <span class="text-primary">extends</span> (...args: <span class="text-secondary">any</span>[]) => <span class="text-secondary">any</span>>(
+  fn: T,
+  delay: <span class="text-secondary">number</span>
+): DebouncedFunction<T> {
+  <span class="text-primary font-semibold">let</span> timerId: ReturnType<<span class="text-primary font-semibold">typeof</span> setTimeout> | <span class="text-tertiary">null</span> = <span class="text-tertiary">null</span>;
+  <span class="text-primary font-semibold">let</span> lastArgs: Parameters<T> | <span class="text-tertiary">null</span> = <span class="text-tertiary">null</span>;
+  <span class="text-primary font-semibold">let</span> result: ReturnType<T> | <span class="text-tertiary">undefined</span>;
+
+  <span class="text-primary font-semibold">const</span> debounced = (...args: Parameters<T>) => {
+    lastArgs = args;
+    <span class="text-primary font-semibold">if</span> (timerId) clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      result = fn(...(lastArgs <span class="text-primary font-semibold">as</span> Parameters<T>));
+      timerId = <span class="text-tertiary">null</span>;
+      lastArgs = <span class="text-tertiary">null</span>;
+    }, delay);
+    <span class="text-primary font-semibold">return</span> result;
+  };
+
+  debounced.cancel = () => {
+    <span class="text-primary font-semibold">if</span> (timerId) clearTimeout(timerId);
+    timerId = <span class="text-tertiary">null</span>;
+    lastArgs = <span class="text-tertiary">null</span>;
+  };
+
+  debounced.flush = () => {
+    <span class="text-primary font-semibold">if</span> (timerId && lastArgs) {
+      clearTimeout(timerId);
+      result = fn(...lastArgs);
+      timerId = <span class="text-tertiary">null</span>;
+      lastArgs = <span class="text-tertiary">null</span>;
+    }
+    <span class="text-primary font-semibold">return</span> result;
+  };
+
+  <span class="text-primary font-semibold">return</span> debounced;
+}</pre>
+</div>
+<!-- Card Footer -->
+<div class="p-space-sm bg-surface-container flex items-center justify-between">
+<button class="px-space-sm py-1 rounded bg-surface-container-high text-on-surface hover:text-primary font-label-code-sm text-label-code-sm transition-colors flex items-center gap-space-xs" onclick="copyModelOutput(1)">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span>Copy TS</span>
+</button>
+<button class="px-space-sm py-1 rounded bg-primary text-on-primary font-label-code-sm text-label-code-sm hover:bg-primary-container hover:text-on-primary-container transition-all flex items-center gap-space-xs" onclick="sendSnippetToSandbox('gemini')">
+<span class="material-symbols-outlined text-[14px]">send_to_mobile</span>
+<span>Send to Sandbox</span>
+</button>
+</div>
+</div>
+<!-- MODEL 2: Groq Llama 3.3 70B -->
+<div class="flex flex-col rounded-xl bg-surface-container-low shadow-md overflow-hidden">
+<!-- Model Header -->
+<div class="p-space-md bg-surface-container flex items-center justify-between shadow-xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface leading-tight">Groq Llama 3.3 70B</h3>
+<span class="font-label-code-sm text-[10px] text-outline">Meta / Groq LPUs • Speculative Decode</span>
+</div>
+</div>
+<span class="bg-secondary/15 text-secondary px-space-xs py-0.5 rounded font-label-code-sm text-[10px]">Fastest Throughput</span>
+</div>
+<!-- Telemetry Chips -->
+<div class="grid grid-cols-3 p-space-sm bg-surface-container-lowest text-center gap-space-xs">
+<div class="flex flex-col">
+<span class="font-label-ui text-[10px] text-outline">SPEED</span>
+<span class="font-label-code-md text-label-code-md text-secondary font-semibold">288 tok/s</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-ui text-[10px] text-outline">TTFT (LATENCY)</span>
+<span class="font-label-code-md text-label-code-md text-secondary font-semibold">94 ms</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-ui text-[10px] text-outline">NET COST</span>
+<span class="font-label-code-md text-label-code-md text-secondary-fixed font-semibold">$0.00</span>
+</div>
+</div>
+<!-- Code Block Output -->
+<div class="p-space-md bg-surface-container-lowest flex-1 overflow-auto max-h-[380px] font-label-code-sm text-[12px] leading-[20px] text-on-surface">
+<pre class="text-on-surface-variant font-label-code-sm"><span class="text-secondary font-semibold">type</span> AnyFunction = (...args: <span class="text-secondary">any</span>[]) => <span class="text-secondary">any</span>;
+
+<span class="text-secondary font-semibold">export interface</span> DebounceOptions {
+  leading?: <span class="text-secondary">boolean</span>;
+  maxWait?: <span class="text-secondary">number</span>;
+}
+
+<span class="text-secondary font-semibold">export function</span> debounce<F <span class="text-secondary">extends</span> AnyFunction>(
+  fn: F,
+  ms: <span class="text-secondary">number</span>,
+  options: DebounceOptions = {}
+) {
+  <span class="text-secondary font-semibold">let</span> timeoutId: NodeJS.Timeout | <span class="text-tertiary">undefined</span>;
+  <span class="text-secondary font-semibold">let</span> storedArgs: Parameters<F> | <span class="text-tertiary">undefined</span>;
+
+  <span class="text-secondary font-semibold">const</span> debounced = (...args: Parameters<F>): <span class="text-tertiary">void</span> => {
+    storedArgs = args;
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      <span class="text-secondary font-semibold">if</span> (storedArgs) fn(...storedArgs);
+      storedArgs = <span class="text-tertiary">undefined</span>;
+    }, ms);
+  };
+
+  debounced.cancel = () => {
+    clearTimeout(timeoutId);
+    storedArgs = <span class="text-tertiary">undefined</span>;
+  };
+
+  debounced.flush = () => {
+    <span class="text-secondary font-semibold">if</span> (storedArgs) {
+      fn(...storedArgs);
+      debounced.cancel();
+    }
+  };
+
+  <span class="text-secondary font-semibold">return</span> debounced;
+}</pre>
+</div>
+<!-- Card Footer -->
+<div class="p-space-sm bg-surface-container flex items-center justify-between">
+<button class="px-space-sm py-1 rounded bg-surface-container-high text-on-surface hover:text-secondary font-label-code-sm text-label-code-sm transition-colors flex items-center gap-space-xs" onclick="copyModelOutput(2)">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span>Copy TS</span>
+</button>
+<button class="px-space-sm py-1 rounded bg-secondary text-on-secondary font-label-code-sm text-label-code-sm hover:bg-secondary-container hover:text-on-secondary-container transition-all flex items-center gap-space-xs" onclick="sendSnippetToSandbox('groq')">
+<span class="material-symbols-outlined text-[14px]">send_to_mobile</span>
+<span>Send to Sandbox</span>
+</button>
+</div>
+</div>
+<!-- MODEL 3: DeepSeek V3 / OpenRouter Free -->
+<div class="flex flex-col rounded-xl bg-surface-container-low shadow-md overflow-hidden">
+<!-- Model Header -->
+<div class="p-space-md bg-surface-container flex items-center justify-between shadow-xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary animate-pulse"></span>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface leading-tight">DeepSeek V3</h3>
+<span class="font-label-code-sm text-[10px] text-outline">OpenRouter Free Gate • 671B MoE</span>
+</div>
+</div>
+<span class="bg-tertiary/15 text-tertiary px-space-xs py-0.5 rounded font-label-code-sm text-[10px]">Reasoning Benchmark</span>
+</div>
+<!-- Telemetry Chips -->
+<div class="grid grid-cols-3 p-space-sm bg-surface-container-lowest text-center gap-space-xs">
+<div class="flex flex-col">
+<span class="font-label-ui text-[10px] text-outline">SPEED</span>
+<span class="font-label-code-md text-label-code-md text-tertiary font-semibold">112 tok/s</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-ui text-[10px] text-outline">TTFT (LATENCY)</span>
+<span class="font-label-code-md text-label-code-md text-tertiary font-semibold">340 ms</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-ui text-[10px] text-outline">NET COST</span>
+<span class="font-label-code-md text-label-code-md text-secondary-fixed font-semibold">$0.00</span>
+</div>
+</div>
+<!-- Code Block Output -->
+<div class="p-space-md bg-surface-container-lowest flex-1 overflow-auto max-h-[380px] font-label-code-sm text-[12px] leading-[20px] text-on-surface">
+<pre class="text-on-surface-variant font-label-code-sm"><span class="text-tertiary font-semibold">type</span> Procedure = (...args: <span class="text-secondary">any</span>[]) => <span class="text-secondary">any</span>;
+
+<span class="text-tertiary font-semibold">export interface</span> Debounced<T <span class="text-tertiary">extends</span> Procedure> {
+  (...args: Parameters<T>): <span class="text-tertiary">void</span>;
+  cancel: () => <span class="text-tertiary">void</span>;
+  flush: () => <span class="text-tertiary">void</span>;
+}
+
+<span class="text-tertiary font-semibold">export function</span> debounce<T <span class="text-tertiary">extends</span> Procedure>(
+  callback: T,
+  wait: <span class="text-secondary">number</span>
+): Debounced<T> {
+  <span class="text-tertiary font-semibold">let</span> timeoutId: ReturnType<<span class="text-primary font-semibold">typeof</span> setTimeout> | <span class="text-tertiary">undefined</span>;
+  <span class="text-tertiary font-semibold">let</span> pendingArgs: Parameters<T> | <span class="text-tertiary">undefined</span>;
+
+  <span class="text-tertiary font-semibold">function</span> debounced(...args: Parameters<T>) {
+    pendingArgs = args;
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      invoke();
+    }, wait);
+  }
+
+  <span class="text-tertiary font-semibold">function</span> invoke() {
+    <span class="text-tertiary font-semibold">if</span> (pendingArgs !== <span class="text-tertiary">undefined</span>) {
+      callback(...pendingArgs);
+      pendingArgs = <span class="text-tertiary">undefined</span>;
+    }
+  }
+
+  debounced.cancel = () => {
+    clearTimeout(timeoutId);
+    pendingArgs = <span class="text-tertiary">undefined</span>;
+  };
+
+  debounced.flush = () => {
+    clearTimeout(timeoutId);
+    invoke();
+  };
+
+  <span class="text-tertiary font-semibold">return</span> debounced;
+}</pre>
+</div>
+<!-- Card Footer -->
+<div class="p-space-sm bg-surface-container flex items-center justify-between">
+<button class="px-space-sm py-1 rounded bg-surface-container-high text-on-surface hover:text-tertiary font-label-code-sm text-label-code-sm transition-colors flex items-center gap-space-xs" onclick="copyModelOutput(3)">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span>Copy TS</span>
+</button>
+<button class="px-space-sm py-1 rounded bg-tertiary-container text-on-tertiary-container font-label-code-sm text-label-code-sm hover:bg-tertiary hover:text-on-tertiary transition-all flex items-center gap-space-xs" onclick="sendSnippetToSandbox('deepseek')">
+<span class="material-symbols-outlined text-[14px]">send_to_mobile</span>
+<span>Send to Sandbox</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Visual Benchmark Latency Chart (Pure SVG) -->
+<div class="p-space-md rounded-xl bg-surface-container-low shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-ui text-label-ui uppercase tracking-wider text-outline font-semibold">Tokens Per Second & Latency Distribution</span>
+<span class="font-label-code-sm text-label-code-sm text-secondary">Normalized benchmark across 20 sample iterations</span>
+</div>
+<div class="w-full h-32 flex items-end gap-space-md pt-4">
+<!-- Gemini Bar -->
+<div class="flex-1 flex flex-col items-center gap-space-xs">
+<div class="font-label-code-sm text-[11px] text-primary">164 tok/s</div>
+<div class="w-full bg-surface-container-highest rounded h-20 relative overflow-hidden">
+<div class="absolute bottom-0 w-full bg-primary rounded transition-all duration-700" style="height: 57%;"></div>
+</div>
+<span class="font-label-code-sm text-label-code-sm text-on-surface">Gemini 3.8 Flash</span>
+</div>
+<!-- Groq Bar -->
+<div class="flex-1 flex flex-col items-center gap-space-xs">
+<div class="font-label-code-sm text-[11px] text-secondary font-bold">288 tok/s (1st)</div>
+<div class="w-full bg-surface-container-highest rounded h-20 relative overflow-hidden">
+<div class="absolute bottom-0 w-full bg-secondary rounded transition-all duration-700" style="height: 100%;"></div>
+</div>
+<span class="font-label-code-sm text-label-code-sm text-on-surface">Groq Llama 3.3 70B</span>
+</div>
+<!-- DeepSeek Bar -->
+<div class="flex-1 flex flex-col items-center gap-space-xs">
+<div class="font-label-code-sm text-[11px] text-tertiary">112 tok/s</div>
+<div class="w-full bg-surface-container-highest rounded h-20 relative overflow-hidden">
+<div class="absolute bottom-0 w-full bg-tertiary rounded transition-all duration-700" style="height: 38%;"></div>
+</div>
+<span class="font-label-code-sm text-label-code-sm text-on-surface">DeepSeek V3</span>
+</div>
+</div>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- VIEW 3: DEV UTILITIES (JSON / STACK TRACE / REST CLIENT)                  -->
+<!-- ========================================================================= -->
+<div class="main-view-content hidden flex-col w-full p-margin-desktop bg-surface gap-space-md" id="view-utilities">
+<!-- Sub-Navigation Pills -->
+<div class="flex items-center gap-space-xs overflow-x-auto pb-1 bg-surface-container-low p-space-xs rounded-xl shadow-sm">
+<button class="util-sub-pill px-space-md py-space-xs rounded font-label-ui text-label-ui flex items-center gap-space-xs transition-all bg-surface-container-highest text-on-surface" id="utilPill-json" onclick="switchUtilitySubTab('json')">
+<span class="material-symbols-outlined text-[16px] text-secondary">data_object</span>
+<span>JSON Sanitizer & TS Interface</span>
+</button>
+<button class="util-sub-pill px-space-md py-space-xs rounded font-label-ui text-label-ui flex items-center gap-space-xs transition-all text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface" id="utilPill-stack" onclick="switchUtilitySubTab('stack')">
+<span class="material-symbols-outlined text-[16px] text-error">bug_report</span>
+<span>Stack Trace & Error Explainer</span>
+</button>
+<button class="util-sub-pill px-space-md py-space-xs rounded font-label-ui text-label-ui flex items-center gap-space-xs transition-all text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface" id="utilPill-rest" onclick="switchUtilitySubTab('rest')">
+<span class="material-symbols-outlined text-[16px] text-primary">http</span>
+<span>Lightweight REST Client</span>
+</button>
+</div>
+<!-- SUBTOOL 1: JSON Sanitizer & TS Interface Generator -->
+<div class="util-subtool-content flex flex-col xl:flex-row gap-gutter-desktop" id="subtool-json">
+<!-- Input Left -->
+<div class="flex-1 flex flex-col rounded-xl bg-surface-container-low p-space-md shadow-md gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px]">input</span>
+<span class="font-headline-md text-headline-md text-on-surface">Raw JSON / Malformed Payload</span>
+</div>
+<button class="px-space-sm py-1 rounded bg-secondary text-on-secondary font-label-code-sm text-label-code-sm hover:bg-secondary-container hover:text-on-secondary-container transition-all flex items-center gap-space-xs" onclick="sanitizeJsonInput()">
+<span class="material-symbols-outlined text-[14px]">auto_fix_high</span>
+<span>Sanitize & Prettify</span>
+</button>
+</div>
+<textarea class="w-full h-80 p-space-sm bg-surface-container-lowest rounded font-label-code-sm text-label-code-sm text-on-surface leading-relaxed focus:outline-none focus:ring-1 focus:ring-secondary resize-none shadow-inner" id="json-input" placeholder="Paste unformatted or escaped JSON here...">{
+  "id": "usr_9981a",
+  "username": "alex_dev",
+  "roles": ["admin", "contributor"],
+  "metrics": {
+    "deployments": 42,
+    "lastLatencyMs": 14.8,
+    "active": true
+  },
+  "tier": "enterprise_byok"
+}</textarea>
+<div class="flex items-center justify-between font-label-code-sm text-label-code-sm text-outline">
+<span>Accepts trailing commas, unquoted keys, and stringified JSON</span>
+<button class="hover:text-error transition-colors" onclick="document.getElementById('json-input').value = ''">Clear</button>
+</div>
+</div>
+<!-- Output Right -->
+<div class="flex-1 flex flex-col rounded-xl bg-surface-container-low p-space-md shadow-md gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px]">code</span>
+<span class="font-headline-md text-headline-md text-on-surface">Generated TypeScript Interface</span>
+</div>
+<button class="px-space-sm py-1 rounded bg-primary text-on-primary font-label-code-sm text-label-code-sm hover:bg-primary-container hover:text-on-primary-container transition-all flex items-center gap-space-xs" onclick="copyGeneratedTs()">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span>Copy Interface</span>
+</button>
+</div>
+<div class="w-full h-80 p-space-sm bg-surface-container-lowest rounded overflow-auto font-label-code-sm text-label-code-sm leading-relaxed text-on-surface shadow-inner">
+<pre class="text-on-surface-variant font-label-code-sm" id="json-ts-output"><span class="text-primary font-semibold">export interface</span> RootSchema {
+  id: <span class="text-secondary">string</span>;
+  username: <span class="text-secondary">string</span>;
+  roles: <span class="text-secondary">string</span>[];
+  metrics: Metrics;
+  tier: <span class="text-secondary">string</span>;
+}
+
+<span class="text-primary font-semibold">export interface</span> Metrics {
+  deployments: <span class="text-secondary">number</span>;
+  lastLatencyMs: <span class="text-secondary">number</span>;
+  active: <span class="text-secondary">boolean</span>;
+}</pre>
+</div>
+<div class="flex items-center justify-between font-label-code-sm text-label-code-sm text-outline">
+<span>Auto-inferred nested sub-interfaces & array typings</span>
+<span class="text-secondary">Type safety 100% compliant</span>
+</div>
+</div>
+</div>
+<!-- SUBTOOL 2: Stack Trace & Error Explainer -->
+<div class="util-subtool-content hidden flex-col xl:flex-row gap-gutter-desktop" id="subtool-stack">
+<div class="flex-1 flex flex-col rounded-xl bg-surface-container-low p-space-md shadow-md gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-error text-[18px]">emergency</span>
+<span class="font-headline-md text-headline-md text-on-surface">Raw Exception Log / Stack Trace</span>
+</div>
+<button class="px-space-sm py-1 rounded bg-error-container text-on-error-container font-label-code-sm text-label-code-sm hover:opacity-90 transition-all flex items-center gap-space-xs" onclick="analyzeStackTrace()">
+<span class="material-symbols-outlined text-[14px]">psychology</span>
+<span>Explain Root Cause</span>
+</button>
+</div>
+<textarea class="w-full h-80 p-space-sm bg-surface-container-lowest rounded font-label-code-sm text-[12px] text-error leading-relaxed focus:outline-none focus:ring-1 focus:ring-error resize-none shadow-inner" id="stacktrace-input" placeholder="Paste runtime error stack here...">TypeError: Cannot read properties of undefined (reading 'map')
+    at UserDashboard (webpack-internal:///./components/UserDashboard.tsx:48:22)
+    at renderWithHooks (react-dom.development.js:14985:18)
+    at mountIndeterminateComponent (react-dom.development.js:17811:13)
+    at beginWork (react-dom.development.js:19049:16)</textarea>
+<span class="font-label-code-sm text-label-code-sm text-outline">Detects React hydration, V8 engine panics, Python Tracebacks & Go panics</span>
+</div>
+<div class="flex-1 flex flex-col rounded-xl bg-surface-container-low p-space-md shadow-md gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px]">verified</span>
+<span class="font-headline-md text-headline-md text-on-surface">AI Root Cause Analysis & Proposed Fix</span>
+</div>
+<span class="font-label-code-sm text-label-code-sm text-secondary bg-secondary/10 px-space-xs py-0.5 rounded">Fixed in 1 line</span>
+</div>
+<div class="w-full h-80 p-space-md bg-surface-container-lowest rounded overflow-auto font-body-sm text-body-sm text-on-surface-variant flex flex-col gap-space-sm shadow-inner">
+<div class="p-space-xs rounded bg-surface-container-high text-on-surface font-label-code-sm text-[12px]">
+<strong>Root Cause:</strong> The variable passed to <code>.map()</code> is evaluated before the asynchronous fetch promise resolves, returning <code>undefined</code> on initial mount.
+          </div>
+<span class="font-label-ui text-label-ui uppercase tracking-wider text-outline font-semibold">Recommended Code Replacement</span>
+<pre class="p-space-sm rounded bg-surface-container font-label-code-sm text-[12px] text-secondary overflow-x-auto">// Replace:
+data.users.map((u) => <Card key={u.id} {...u} />)
+
+// With optional chaining + fallback array:
+(data?.users ?? []).map((u) => <Card key={u.id} {...u} />)</pre>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Alternatively, gate the render block with an explicit hydration guard: <code>if (!data) return <SkeletonLoader />;</code>.
+          </p>
+</div>
+</div>
+</div>
+<!-- SUBTOOL 3: Lightweight REST Client -->
+<div class="util-subtool-content hidden flex-col rounded-xl bg-surface-container-low p-space-md shadow-md gap-space-md" id="subtool-rest">
+<!-- Endpoint Bar -->
+<div class="flex flex-col md:flex-row items-stretch md:items-center gap-space-xs">
+<select class="h-10 px-space-sm rounded bg-surface-container-lowest text-secondary font-label-code-md text-label-code-md focus:outline-none cursor-pointer" id="rest-method">
+<option value="GET">GET</option>
+<option value="POST">POST</option>
+<option value="PUT">PUT</option>
+<option value="DELETE">DELETE</option>
+</select>
+<input class="flex-1 h-10 px-space-md rounded bg-surface-container-lowest text-on-surface font-label-code-sm text-label-code-sm focus:outline-none focus:ring-1 focus:ring-primary shadow-inner" id="rest-url" type="text" value="https://api.github.com/repos/facebook/react"/>
+<button class="h-10 px-space-lg rounded bg-primary text-on-primary font-label-ui text-label-ui hover:bg-primary-container hover:text-on-primary-container transition-all flex items-center justify-center gap-space-xs shadow-md" onclick="executeRestRequest()">
+<span class="material-symbols-outlined text-[16px]">send</span>
+<span>Send Request</span>
+</button>
+</div>
+<!-- Headers & Response Split -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter-desktop">
+<!-- Request Headers / Payload -->
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-ui text-label-ui text-outline uppercase font-semibold">Request Headers (JSON)</span>
+<textarea class="h-64 p-space-sm bg-surface-container-lowest rounded font-label-code-sm text-label-code-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary resize-none shadow-inner leading-relaxed" id="rest-headers">{
+  "Accept": "application/vnd.github.v3+json",
+  "User-Agent": "DevPulse-Client-v2.5"
+}</textarea>
+</div>
+<!-- Response Body Preview -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-ui text-label-ui text-outline uppercase font-semibold">Response (HTTP 200 OK)</span>
+<span class="font-label-code-sm text-label-code-sm text-secondary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> 112ms • 4.8 KB
+            </span>
+</div>
+<div class="h-64 p-space-sm bg-surface-container-lowest rounded font-label-code-sm text-label-code-sm text-on-surface-variant overflow-auto shadow-inner leading-relaxed" id="rest-response-body">
+<pre class="font-label-code-sm">{
+  "id": 10270250,
+  "node_id": "MDEwOlJlcG9zaXRvcnkxMDI3MDI1MA==",
+  "name": "react",
+  "full_name": "facebook/react",
+  "private": false,
+  "html_url": "https://github.com/facebook/react",
+  "description": "The library for web and native user interfaces.",
+  "stargazers_count": 228410,
+  "watchers_count": 228410,
+  "language": "JavaScript",
+  "open_issues_count": 1390,
+  "license": {
+    "key": "mit",
+    "name": "MIT License"
+  }
+}</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- FLOATING TOAST NOTIFICATION CONTAINER                                     -->
+<!-- ========================================================================= -->
+<div class="fixed bottom-16 right-6 z-50 flex flex-col gap-space-xs pointer-events-none" id="toast-container"></div>
+<!-- ========================================================================= -->
+<!-- MODAL: BYOK SETTINGS MODAL                                                -->
+<!-- ========================================================================= -->
+<div class="fixed inset-0 z-50 hidden items-center justify-center bg-surface-container-lowest/80 backdrop-blur-sm p-4" id="byok-modal">
+<div class="w-full max-w-lg rounded-xl bg-surface-container-low p-space-lg shadow-xl flex flex-col gap-space-md relative">
+<button class="absolute top-4 right-4 text-outline hover:text-on-surface transition-colors" onclick="closeModal('byok-modal')">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[24px]">key</span>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">BYOK (Bring Your Own Keys)</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Unlock unmetered generation & high-context reasoning models</p>
+</div>
+</div>
+<!-- Privacy Callout -->
+<div class="p-space-sm rounded bg-surface-container flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-[18px] shrink-0">shield</span>
+<p class="font-label-code-sm text-label-code-sm text-secondary-fixed">
+          Keys are stored 100% locally in browser memory (IndexedDB/LocalStorage) and are strictly never transmitted to our servers or third-party loggers.
+        </p>
+</div>
+<div class="flex flex-col gap-space-sm font-label-code-sm text-label-code-sm">
+<div>
+<label class="block text-outline pb-1 font-label-ui text-label-ui uppercase">Google Gemini API Key</label>
+<input class="w-full h-9 px-space-sm rounded bg-surface-container-lowest text-on-surface focus:outline-none focus:ring-1 focus:ring-primary shadow-inner" id="key-gemini" placeholder="AIzaSy..." type="password"/>
+</div>
+<div>
+<label class="block text-outline pb-1 font-label-ui text-label-ui uppercase">Groq Cloud API Key</label>
+<input class="w-full h-9 px-space-sm rounded bg-surface-container-lowest text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary shadow-inner" id="key-groq" placeholder="gsk_..." type="password"/>
+</div>
+<div>
+<label class="block text-outline pb-1 font-label-ui text-label-ui uppercase">OpenRouter / DeepSeek Key</label>
+<input class="w-full h-9 px-space-sm rounded bg-surface-container-lowest text-on-surface focus:outline-none focus:ring-1 focus:ring-tertiary shadow-inner" id="key-openrouter" placeholder="sk-or-v1-..." type="password"/>
+</div>
+</div>
+<div class="flex items-center justify-end gap-space-xs pt-space-xs">
+<button class="px-space-md py-1.5 rounded text-outline hover:text-on-surface font-label-code-sm text-label-code-sm transition-colors" onclick="closeModal('byok-modal')">
+          Cancel
+        </button>
+<button class="px-space-md py-1.5 rounded bg-primary text-on-primary font-label-ui text-label-ui hover:bg-primary-container hover:text-on-primary-container transition-all shadow-md" onclick="saveApiKeys()">
+          Save to LocalStorage
+        </button>
+</div>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- MODAL: LEGAL / CLIENT-SIDE EXECUTION NOTICE DRAWER                        -->
+<!-- ========================================================================= -->
+<div class="fixed inset-0 z-50 hidden items-center justify-center bg-surface-container-lowest/80 backdrop-blur-sm p-4" id="legal-modal">
+<div class="w-full max-w-2xl rounded-xl bg-surface-container-low p-space-lg shadow-xl flex flex-col gap-space-md relative max-h-[870px] overflow-y-auto">
+<button class="absolute top-4 right-4 text-outline hover:text-on-surface transition-colors" onclick="closeModal('legal-modal')">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-outline text-[24px]">gavel</span>
+<h3 class="font-headline-md text-headline-md text-on-surface" id="legal-title">Client-Side Execution Notice</h3>
+</div>
+<div class="font-body-md text-body-md text-on-surface-variant flex flex-col gap-space-sm leading-relaxed" id="legal-body">
+<p>DevPulse AI operates purely inside your local browser thread using Sandboxed Iframes and modern Web API primitives.</p>
+<p>1. <strong>Isolated Execution:</strong> All scripts executed inside the Artifact Sandbox run with restricted attributes (<code>sandbox="allow-scripts allow-modals"</code>) preventing cross-origin access to host authentication tokens or cookies.</p>
+<p>2. <strong>Data Retention:</strong> We store zero user code or benchmarks on external persistence layers without your explicit command invocation.</p>
+<p>3. <strong>DMCA & IP Protection:</strong> You own 100% of the synthesized UI artifacts and computational components generated within this toolchain.</p>
+</div>
+<div class="flex justify-end pt-space-xs">
+<button class="px-space-md py-1.5 rounded bg-surface-container-highest text-on-surface font-label-code-sm text-label-code-sm hover:bg-surface-bright transition-colors" onclick="closeModal('legal-modal')">
+          Acknowledge & Dismiss
+        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- CLIENT-SIDE LOGIC SCRIPT (Zero external dependencies)                     -->
+<!-- ========================================================================= -->
+<script>
+  // STARTER TEMPLATES
+  const TEMPLATES = {
+    pricing: {
+      html: `<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+  <style>body { font-family: 'Geist', sans-serif; }</style>
+</head>
+<body class="bg-[#090A0F] text-slate-100 min-h-screen flex items-center justify-center p-6 antialiased">
+  <div class="max-w-4xl w-full flex flex-col items-center gap-8">
+    
+    <!-- Header -->
+    <div class="text-center space-y-3">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-mono">
+        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+        Zero Platform Lock-in
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white">Compute that scales to infinity</h1>
+      <p class="text-slate-400 text-sm max-w-md mx-auto">Instant serverless Postgres databases, branching workflows, and sub-10ms global read replicas.</p>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+      <!-- Hobby Card -->
+      <div class="p-6 rounded-2xl bg-[#12141D] border border-[#1F2430] flex flex-col justify-between hover:border-slate-700 transition-all">
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-slate-400 uppercase tracking-wider">Developer Hobby</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono">Active</span>
+          </div>
+          <div>
+            <div class="flex items-baseline gap-1">
+              <span class="text-4xl font-extrabold text-white">$0</span>
+              <span class="text-xs text-slate-400 font-mono">/ forever</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Perfect for edge testing & fast prototyping.</p>
+          </div>
+          <ul class="space-y-2.5 text-xs text-slate-300 pt-2 border-t border-[#1F2430]">
+            <li class="flex items-center gap-2">✓ 512 MB High-speed SSD Storage</li>
+            <li class="flex items-center gap-2">✓ 1 Active Dev Branch</li>
+            <li class="flex items-center gap-2">✓ Community Discord Support</li>
+          </ul>
+        </div>
+        <button class="w-full mt-6 py-2.5 rounded-lg bg-[#161926] hover:bg-[#1F2430] text-slate-200 text-xs font-medium border border-[#2A3042] transition-colors">Current Workspace</button>
+      </div>
+
+      <!-- Pro Cloud Card (Hero) -->
+      <div class="p-6 rounded-2xl bg-gradient-to-b from-[#181B2A] to-[#12141D] border border-indigo-500/40 relative shadow-2xl flex flex-col justify-between">
+        <div class="absolute -top-3 right-6 px-3 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-mono font-semibold uppercase tracking-wider shadow-lg">Recommended</div>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-indigo-300 uppercase tracking-wider">Cloud Scale Pro</span>
+          </div>
+          <div>
+            <div class="flex items-baseline gap-1">
+              <span class="text-4xl font-extrabold text-white">$24</span>
+              <span class="text-xs text-slate-400 font-mono">/ node / mo</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Unlimited branches with automatic cold boot mitigation.</p>
+          </div>
+          <ul class="space-y-2.5 text-xs text-slate-200 pt-2 border-t border-indigo-500/20">
+            <li class="flex items-center gap-2 text-indigo-200">✓ 50 GB NVMe + Autoscaling Pool</li>
+            <li class="flex items-center gap-2 text-indigo-200">✓ Instant DB Branching & Time Travel</li>
+            <li class="flex items-center gap-2 text-indigo-200">✓ Dedicated SOC2 & HIPAA Compliance</li>
+          </ul>
+        </div>
+        <button onclick="alert('⚡ Upgrade token generated: DevPulse-Pro-Cluster-Ready!')" class="w-full mt-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition-all">Provision Pro Cluster →</button>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>`,
+      css: `/* Custom Glassmorphism & Token Overrides */
+::selection {
+  background-color: #6366F1;
+  color: #FFFFFF;
+}`,
+      js: `// Interactive Pricing State
+console.log('[DevPulse] Pricing Card mounted successfully.');`
+    },
+
+    crypto: {
+      html: `<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap">
+  <style>body { font-family: 'JetBrains Mono', monospace; }</style>
+</head>
+<body class="bg-[#0B0D14] text-slate-200 min-h-screen p-6 flex flex-col justify-center items-center antialiased">
+  <div class="max-w-2xl w-full bg-[#121520] border border-[#1E2335] rounded-xl p-6 shadow-2xl space-y-6">
+    <div class="flex items-center justify-between border-b border-[#1E2335] pb-4">
+      <div class="flex items-center gap-3">
+        <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+        <h2 class="text-sm font-semibold tracking-wide text-white uppercase">ETH / USD Perpetual Feed</h2>
+      </div>
+      <span class="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">+4.82% 24h</span>
+    </div>
+    
+    <div class="flex items-baseline justify-between">
+      <div>
+        <span class="text-3xl font-bold text-white">$3,489.12</span>
+        <p class="text-xs text-slate-500 mt-1">24h High: $3,520.00 • Low: $3,310.40</p>
+      </div>
+      <div class="text-right">
+        <span class="text-xs text-slate-400">Orderbook Depth</span>
+        <p class="text-xs text-emerald-400 font-semibold">$14.2M Bid Wall</p>
+      </div>
+    </div>
+
+    <!-- Inline Simulated SVG Sparkline -->
+    <div class="w-full h-24 bg-[#090A0F] rounded-lg p-2 border border-[#1E2335] flex items-end">
+      <svg class="w-full h-full overflow-visible" viewBox="0 0 100 30" preserveAspectRatio="none">
+        <polyline fill="none" stroke="#10B981" stroke-width="2" points="0,25 15,20 30,22 45,14 60,18 75,8 90,12 100,4" />
+      </svg>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 pt-2">
+      <button onclick="alert('⚡ Buy Limit Order Executed!')" class="py-2.5 rounded bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold uppercase tracking-wider transition-colors">Market Buy</button>
+      <button onclick="alert('📉 Short Position Opened!')" class="py-2.5 rounded bg-rose-500/20 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/30 text-xs font-bold uppercase tracking-wider transition-colors">Market Short</button>
+    </div>
+  </div>
+</body>
+</html>`,
+      css: ``,
+      js: `console.log('[Crypto] Realtime WebSocket connected.');`
+    },
+
+    pomodoro: {
+      html: `<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&display=swap">
+  <style>body { font-family: 'Geist', sans-serif; }</style>
+</head>
+<body class="bg-[#090A0F] text-slate-100 min-h-screen flex items-center justify-center p-6 antialiased">
+  <div class="max-w-sm w-full bg-[#12141D] border border-[#22283A] rounded-2xl p-6 shadow-2xl flex flex-col items-center gap-6 text-center">
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+      <span class="text-xs font-mono uppercase tracking-widest text-slate-400">Deep Work Cycle</span>
+    </div>
+
+    <div class="relative w-44 h-44 rounded-full border-4 border-[#1E2335] flex items-center justify-center bg-[#0C0E17] shadow-inner">
+      <div class="text-center">
+        <span id="timer-display" class="text-4xl font-bold tracking-tight text-white font-mono">25:00</span>
+        <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Focus Block</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 w-full">
+      <button id="start-btn" onclick="toggleTimer()" class="flex-1 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-xs font-semibold uppercase tracking-wider transition-colors">Start Focus</button>
+      <button onclick="resetTimer()" class="px-4 py-2 rounded-lg bg-[#1C2030] hover:bg-[#252B42] text-slate-300 text-xs font-mono transition-colors">Reset</button>
+    </div>
+  </div>
+
+  <script>
+    let seconds = 25 * 60;
+    let timer = null;
+    function updateDisplay() {
+      const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+      const s = (seconds % 60).toString().padStart(2, '0');
+      document.getElementById('timer-display').innerText = m + ':' + s;
+    }
+    function toggleTimer() {
+      const btn = document.getElementById('start-btn');
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+        btn.innerText = 'Resume';
+      } else {
+        timer = setInterval(() => {
+          if (seconds > 0) { seconds--; updateDisplay(); }
+          else { clearInterval(timer); alert('Time up! Take a break.'); }
+        }, 1000);
+        btn.innerText = 'Pause';
+      }
+    }
+    function resetTimer() {
+      if (timer) clearInterval(timer);
+      timer = null;
+      seconds = 25 * 60;
+      updateDisplay();
+      document.getElementById('start-btn').innerText = 'Start Focus';
+    }
+  <\/script>
+</body>
+</html>`,
+      css: ``,
+      js: ``
+    }
+  };
+
+  // ACTIVE EDITOR STATE
+  let activeFiles = {
+    html: TEMPLATES.pricing.html,
+    css: TEMPLATES.pricing.css,
+    js: TEMPLATES.pricing.js
+  };
+  let currentFileKey = 'html';
+
+  // INITIALIZE WORKSPACE
+  window.addEventListener('DOMContentLoaded', () => {
+    // Populate default code
+    const editor = document.getElementById('code-editor');
+    if (editor) {
+      editor.value = activeFiles[currentFileKey];
+      updateLiveFrame();
+      updateGutterNumbers();
+
+      editor.addEventListener('input', () => {
+        activeFiles[currentFileKey] = editor.value;
+        updateLiveFrame();
+        updateGutterNumbers();
+      });
+
+      // Command + Enter shortcut
+      window.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+          simulateAIGeneration();
+        }
+      });
+    }
+
+    // Attach footer click actions to Legal drawer
+    document.querySelectorAll('footer a').forEach((link, idx) => {
+      link.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        const text = link.innerText.trim();
+        if (text.includes('Privacy') || text.includes('Terms') || text.includes('Notice') || text.includes('Cookie')) {
+          document.getElementById('legal-title').innerText = text;
+          openModal('legal-modal');
+        }
+      });
+    });
+
+    // App header BYOK trigger hook
+    document.querySelectorAll('header button').forEach((btn) => {
+      if (btn.innerText.includes('BYOK')) {
+        btn.addEventListener('click', () => openModal('byok-modal'));
+      }
+    });
+  });
+
+  // MAIN VIEW SWITCHER (Sandbox, Benchmarker, Utilities)
+  function switchMainView(viewName) {
+    document.querySelectorAll('.main-view-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.main-view-tab').forEach(el => {
+      el.classList.remove('bg-surface-container-highest', 'text-on-surface');
+      el.classList.add('text-on-surface-variant');
+    });
+
+    const targetView = document.getElementById('view-' + viewName);
+    const targetTab = document.getElementById('viewTab-' + viewName);
+
+    if (targetView && targetTab) {
+      targetView.classList.remove('hidden');
+      targetTab.classList.remove('text-on-surface-variant');
+      targetTab.classList.add('bg-surface-container-highest', 'text-on-surface');
+    }
+  }
+
+  // UTILITY SUB-TABS SWITCHER
+  function switchUtilitySubTab(subTab) {
+    document.querySelectorAll('.util-subtool-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.util-sub-pill').forEach(el => {
+      el.classList.remove('bg-surface-container-highest', 'text-on-surface');
+      el.classList.add('text-on-surface-variant');
+    });
+
+    const activeTool = document.getElementById('subtool-' + subTab);
+    const activePill = document.getElementById('utilPill-' + subTab);
+
+    if (activeTool && activePill) {
+      activeTool.classList.remove('hidden');
+      activeTool.classList.add('flex');
+      activePill.classList.remove('text-on-surface-variant');
+      activePill.classList.add('bg-surface-container-highest', 'text-on-surface');
+    }
+  }
+
+  // CODE FILE TAB SWITCHER
+  function switchEditorFile(ext) {
+    const editor = document.getElementById('code-editor');
+    activeFiles[currentFileKey] = editor.value;
+    currentFileKey = ext;
+
+    document.querySelectorAll('.editor-file-tab').forEach(tab => {
+      tab.classList.remove('bg-surface-container-low', 'text-primary', 'font-semibold');
+      tab.classList.add('text-outline');
+    });
+
+    const targetTab = document.getElementById('editorTab-' + ext);
+    if (targetTab) {
+      targetTab.classList.remove('text-outline');
+      targetTab.classList.add('bg-surface-container-low', 'text-primary', 'font-semibold');
+    }
+
+    editor.value = activeFiles[ext];
+    updateGutterNumbers();
+  }
+
+  // LIVE IFRAME COMPILATION
+  function updateLiveFrame() {
+    const frame = document.getElementById('live-frame');
+    if (!frame) return;
+
+    let fullSource = activeFiles.html;
+    if (activeFiles.css && activeFiles.css.trim().length > 0) {
+      fullSource = fullSource.replace('</head>', `<style>${activeFiles.css}</style></head>`);
+    }
+    if (activeFiles.js && activeFiles.js.trim().length > 0) {
+      fullSource = fullSource.replace('</body>', `<script>${activeFiles.js}<\/script></body>`);
+    }
+
+    frame.srcdoc = fullSource;
+  }
+
+  function refreshLiveFrame() {
+    updateLiveFrame();
+    showToast('Sandbox refreshed from active code buffers.');
+  }
+
+  // PRESET INJECTION
+  function injectStarterPreset(presetKey) {
+    const preset = TEMPLATES[presetKey];
+    if (!preset) return;
+
+    activeFiles.html = preset.html;
+    activeFiles.css = preset.css;
+    activeFiles.js = preset.js;
+
+    const editor = document.getElementById('code-editor');
+    if (editor) {
+      editor.value = activeFiles[currentFileKey];
+      updateLiveFrame();
+      updateGutterNumbers();
+    }
+    showToast(`Injected '${presetKey.toUpperCase()}' starter template!`);
+  }
+
+  // AI SIMULATION GENERATOR
+  function simulateAIGeneration() {
+    const btn = document.getElementById('generate-btn');
+    const input = document.getElementById('prompt-input');
+    const originalText = btn.innerHTML;
+
+    btn.innerHTML = `<span class="material-symbols-outlined text-[16px] animate-spin">progress_activity</span><span>Synthesizing...</span>`;
+    btn.disabled = true;
+
+    setTimeout(() => {
+      injectStarterPreset('pricing');
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+      showToast('Artifact generated and compiled in 480ms!');
+    }, 600);
+  }
+
+  // VIEWPORT RESIZER
+  function setPreviewViewport(width, btn) {
+    const wrapper = document.getElementById('preview-wrapper');
+    wrapper.style.maxWidth = width;
+
+    document.querySelectorAll('.vp-btn').forEach(b => {
+      b.classList.remove('bg-surface-container-high', 'text-on-surface', 'shadow-xs');
+      b.classList.add('text-outline');
+    });
+
+    btn.classList.remove('text-outline');
+    btn.classList.add('bg-surface-container-high', 'text-on-surface', 'shadow-xs');
+  }
+
+  // TOGGLE PREVIEW MODE (Render vs Console)
+  function togglePreviewMode(mode) {
+    const wrapper = document.getElementById('preview-wrapper');
+    const consoleView = document.getElementById('console-view');
+    const renderBtn = document.getElementById('mode-render');
+    const consoleBtn = document.getElementById('mode-console');
+
+    if (mode === 'console') {
+      wrapper.classList.add('hidden');
+      consoleView.classList.remove('hidden');
+      consoleBtn.classList.add('bg-surface-container-high', 'text-on-surface');
+      consoleBtn.classList.remove('text-outline');
+      renderBtn.classList.remove('bg-surface-container-high', 'text-on-surface');
+      renderBtn.classList.add('text-outline');
+    } else {
+      wrapper.classList.remove('hidden');
+      consoleView.classList.add('hidden');
+      renderBtn.classList.add('bg-surface-container-high', 'text-on-surface');
+      renderBtn.classList.remove('text-outline');
+      consoleBtn.classList.remove('bg-surface-container-high', 'text-on-surface');
+      consoleBtn.classList.add('text-outline');
+    }
+  }
+
+  // CODE ACTIONS
+  function copyCurrentCode() {
+    const code = document.getElementById('code-editor').value;
+    navigator.clipboard.writeText(code).then(() => {
+      showToast('Active file copied to clipboard!');
+    }).catch(() => {
+      showToast('Active code copied!');
+    });
+  }
+
+  function shareUrlHash() {
+    const hash = 'artifact-' + Math.random().toString(36).substring(2, 9);
+    window.location.hash = hash;
+    showToast(`Shareable URL generated with hash: #${hash}`);
+  }
+
+  function downloadArtifactHtml() {
+    const blob = new Blob([activeFiles.html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'devpulse-artifact.html';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Downloaded devpulse-artifact.html');
+  }
+
+  function triggerDeployMock() {
+    showToast('🚀 Deploying live node on Vercel Edge Server... Ready in 800ms!');
+  }
+
+  function formatActiveCode() {
+    showToast('Code formatting normalized with Prettier v3.2');
+  }
+
+  function resetEditorCode() {
+    injectStarterPreset('pricing');
+    showToast('Editor reset to clean boilerplate.');
+  }
+
+  // BENCHMARK RUNNER
+  function runParallelBenchmark() {
+    const btn = document.getElementById('run-bench-btn');
+    const btnText = document.getElementById('bench-btn-text');
+    const icon = document.getElementById('bench-icon');
+
+    icon.classList.add('animate-spin');
+    icon.innerText = 'sync';
+    btnText.innerText = 'Evaluating 3 Endpoints...';
+    btn.disabled = true;
+
+    setTimeout(() => {
+      icon.classList.remove('animate-spin');
+      icon.innerText = 'check_circle';
+      btnText.innerText = 'Run Parallel Benchmark';
+      btn.disabled = false;
+      showToast('Parallel benchmark complete: Groq 70B won latency (94ms).');
+    }, 750);
+  }
+
+  function copyModelOutput(modelIdx) {
+    showToast(`Model ${modelIdx} TypeScript solution copied to clipboard!`);
+  }
+
+  function sendSnippetToSandbox(modelKey) {
+    switchMainView('sandbox');
+    showToast(`Injected snippet into Artifact Sandbox from ${modelKey}!`);
+  }
+
+  // UTILITY TOOLS LOGIC
+  function sanitizeJsonInput() {
+    const input = document.getElementById('json-input');
+    try {
+      const parsed = JSON.parse(input.value);
+      input.value = JSON.stringify(parsed, null, 2);
+      showToast('JSON formatted and validated successfully!');
+    } catch (err) {
+      showToast('Sanitized malformed tokens; syntax normalized.');
+    }
+  }
+
+  function copyGeneratedTs() {
+    const text = document.getElementById('json-ts-output').innerText;
+    navigator.clipboard.writeText(text);
+    showToast('TypeScript interface copied to clipboard!');
+  }
+
+  function analyzeStackTrace() {
+    showToast('Stack trace decomposed: Null pointer trapped at line 48.');
+  }
+
+  function executeRestRequest() {
+    const method = document.getElementById('rest-method').value;
+    const url = document.getElementById('rest-url').value;
+    showToast(`Dispatched ${method} ${url} -> HTTP 200 OK`);
+  }
+
+  // CONSOLE INPUT HANDLER
+  function handleConsoleInput(e) {
+    if (e.key === 'Enter') {
+      const val = e.target.value.trim();
+      if (!val) return;
+      const dyn = document.getElementById('dynamic-console-log');
+      dyn.innerHTML = `<span class="text-outline">[Eval]</span> <span class="text-primary font-mono">> ${val}</span> <span class="text-secondary">→ "undefined (Execution OK)"</span>`;
+      e.target.value = '';
+    }
+  }
+
+  function clearConsoleLogs() {
+    document.getElementById('dynamic-console-log').innerHTML = `<span class="text-outline">[Logs cleared]</span>`;
+    showToast('Simulated console cleared.');
+  }
+
+  // GUTTER LINE NUMBERS
+  function updateGutterNumbers() {
+    const editor = document.getElementById('code-editor');
+    const gutter = document.getElementById('code-gutter');
+    if (!editor || !gutter) return;
+    const lines = editor.value.split('\n').length;
+    let gutterHtml = '';
+    for (let i = 1; i <= Math.max(lines, 30); i++) {
+      gutterHtml += i + '<br>';
+    }
+    gutter.innerHTML = gutterHtml;
+  }
+
+  // TOAST DISPATCHER
+  function showToast(message) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = 'px-space-md py-space-xs rounded-lg bg-surface-container-highest text-on-surface border border-outline-variant font-label-code-sm text-label-code-sm shadow-xl flex items-center gap-space-xs transition-all transform translate-y-2 opacity-0';
+    toast.innerHTML = `<span class="material-symbols-outlined text-[16px] text-primary">info</span><span>${message}</span>`;
+    
+    container.appendChild(toast);
+    
+    requestAnimationFrame(() => {
+      toast.classList.remove('translate-y-2', 'opacity-0');
+    });
+
+    setTimeout(() => {
+      toast.classList.add('opacity-0', 'translate-y-2');
+      setTimeout(() => toast.remove(), 300);
+    }, 2800);
+  }
+
+  // MODAL CONTROLS
+  function openModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+  }
+
+  function closeModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  function saveApiKeys() {
+    closeModal('byok-modal');
+    showToast('🔑 API Keys safely committed to encrypted LocalStorage.');
+  }
+</script></main><footer class="w-full bg-surface-container-lowest z-40 shadow-[0_-1px_6px_rgba(0,0,0,0.3)]"><div class="h-12 w-full px-margin-desktop flex flex-col sm:flex-row items-center justify-between gap-space-xs"><div class="flex items-center gap-space-xs"><a class="font-label-code-sm text-label-code-sm text-on-surface-variant hover:text-secondary flex items-center gap-space-xs transition-colors" href="#"><span class="text-secondary font-semibold">🚀</span><span>Need lightning cloud compute? Deploy instant fullstack apps on Vercel & Hostinger →</span></a></div><div class="flex items-center gap-space-md"><a class="font-label-ui text-label-ui text-outline hover:text-on-surface transition-colors" href="#">Privacy Policy</a><a class="font-label-ui text-label-ui text-outline hover:text-on-surface transition-colors" href="#">Terms of Service</a><a class="font-label-ui text-label-ui text-outline hover:text-on-surface transition-colors" href="#">Cookie Disclaimer</a><a class="font-label-ui text-label-ui text-outline hover:text-on-surface transition-colors" href="#">DMCA / Client-Side Execution Notice</a></div></div></footer></body></html>

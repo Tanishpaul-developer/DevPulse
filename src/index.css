@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@layer base {
+  :root,
+  html.dark {
+    --bg-obsidian: #090A0F;
+    --bg-surface: #121318;
+    --bg-lowest: #0d0e13;
+    --bg-low: #1a1b21;
+    --bg-container: #1e1f25;
+    --bg-high: #292a2f;
+    --bg-highest: #34343a;
+    --text-primary: #e3e1e9;
+    --text-secondary: #c7c4d7;
+    --text-muted: #908fa0;
+    --border-subtle: #1F2430;
+    --border-interactive: #2A3042;
+    --accent-indigo: #6366F1;
+    --accent-emerald: #10B981;
+    --accent-amber: #F59E0B;
+  }
+
+  html.light {
+    --bg-obsidian: #F8FAFC;
+    --bg-surface: #F1F5F9;
+    --bg-lowest: #FFFFFF;
+    --bg-low: #F8FAFC;
+    --bg-container: #E2E8F0;
+    --bg-high: #CBD5E1;
+    --bg-highest: #94A3B8;
+    --text-primary: #0F172A;
+    --text-secondary: #334155;
+    --text-muted: #64748B;
+    --border-subtle: #E2E8F0;
+    --border-interactive: #CBD5E1;
+    --accent-indigo: #4F46E5;
+    --accent-emerald: #059669;
+    --accent-amber: #D97706;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-obsidian);
+    color: var(--text-primary);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-feature-settings: "tnum";
+    overscroll-behavior: none;
+    transition: background-color 150ms ease, color 150ms ease;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  code, pre, textarea.font-mono, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Light mode surface overrides for obsidian utility classes */
+html.light .theme-bg-base { background-color: #F8FAFC !important; color: #0F172A !important; }
+html.light .theme-bg-surface { background-color: #F1F5F9 !important; color: #0F172A !important; }
+html.light .theme-bg-lowest { background-color: #FFFFFF !important; color: #0F172A !important; }
+html.light .theme-bg-low { background-color: #F8FAFC !important; color: #0F172A !important; border-color: #E2E8F0 !important; }
+html.light .theme-bg-container { background-color: #F1F5F9 !important; color: #0F172A !important; border-color: #CBD5E1 !important; }
+html.light .theme-bg-high { background-color: #E2E8F0 !important; color: #0F172A !important; }
+html.light .theme-text-main { color: #0F172A !important; }
+html.light .theme-text-sub { color: #334155 !important; }
+html.light .theme-text-muted { color: #64748B !important; }
+html.light .theme-border { border-color: #CBD5E1 !important; }
+html.light .theme-bg-low > span.text-white,
+html.light .theme-bg-lowest h2.text-white,
+html.light .theme-bg-lowest h3.text-white { color: #0F172A !important; }
+html.light .theme-bg-lowest > pre { color: #047857 !important; background-color: #F8FAFC !important; }
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-lowest);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-high);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6366F1;
+}

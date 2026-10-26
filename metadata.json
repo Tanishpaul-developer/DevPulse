@@ -1,0 +1,6 @@
+{
+  "name": "DevPulse AI",
+  "description": "Zero-Login AI Developer Workspace, Instant Artifact Runner, Prompt Benchmarker, and Multi-Model API Rotator Platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

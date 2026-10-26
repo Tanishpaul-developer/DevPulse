@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-secondary":"#003824","on-error-container":"#ffdad6","tertiary":"#ffb95f","primary":"#c0c1ff","background":"#121318","surface-dim":"#121318","inverse-on-surface":"#2f3036","primary-container":"#8083ff","inverse-surface":"#e3e1e9","secondary-fixed-dim":"#4edea3","surface-container-lowest":"#0d0e13","surface":"#121318","tertiary-fixed-dim":"#ffb95f","on-tertiary-fixed-variant":"#653e00","secondary-container":"#00a572","outline-variant":"#464554","inverse-primary":"#494bd6","error-container":"#93000a","on-tertiary-fixed":"#2a1700","on-secondary-fixed":"#002113","on-primary-fixed":"#07006c","primary-fixed":"#e1e0ff","on-primary-container":"#0d0096","secondary":"#4edea3","surface-variant":"#34343a","on-tertiary":"#472a00","surface-container-low":"#1a1b21","error":"#ffb4ab","on-secondary-fixed-variant":"#005236","surface-container":"#1e1f25","surface-container-highest":"#34343a","on-surface":"#e3e1e9","on-primary-fixed-variant":"#2f2ebe","surface-container-high":"#292a2f","tertiary-fixed":"#ffddb8","secondary-fixed":"#6ffbbe","tertiary-container":"#ca8100","on-primary":"#1000a9","surface-bright":"#38393f","outline":"#908fa0","on-tertiary-container":"#3e2400","on-background":"#e3e1e9","on-error":"#690005","on-secondary-container":"#00311f","primary-fixed-dim":"#c0c1ff","surface-tint":"#c0c1ff","on-surface-variant":"#c7c4d7"},borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},spacing:{"gutter-desktop":"1rem","space-lg":"1.25rem","margin":"1rem","margin-desktop":"1.5rem","space-sm":"0.5rem","space-xl":"2rem","space-xs":"0.25rem","space-md":"0.75rem","gutter":"0.75rem"},fontFamily:{"headline-md":["Geist"],"headline-xl":["Geist"],"headline-lg":["Geist"],"body-sm":["Geist"],"headline-xl-mobile":["Geist"],"label-code-sm":["JetBrains Mono"],"label-code-lg":["JetBrains Mono"],"body-md":["Geist"],"headline-lg-mobile":["Geist"],"body-lg":["Geist"],"label-code-md":["JetBrains Mono"],"label-ui":["Geist"]},fontSize:{"headline-md":["18px",{"lineHeight":"26px","letterSpacing":"-0.01em","fontWeight":"500"}],"headline-xl":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"18px","letterSpacing":"0em","fontWeight":"400"}],"headline-xl-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"label-code-sm":["11px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"500"}],"label-code-lg":["13px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"body-md":["13px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"headline-lg-mobile":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-lg":["15px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"400"}],"label-code-md":["12px",{"lineHeight":"18px","letterSpacing":"0em","fontWeight":"400"}],"label-ui":["11px",{"lineHeight":"16px","letterSpacing":"0.04em","fontWeight":"600"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="h-14 w-full px-margin-desktop flex items-center justify-between gap-gutter"><div class="flex items-center gap-space-md shrink-0"><img alt="DevPulse AI Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1U1aldFgYWGxDdMNxsDrJvamoOW30Pnv2iFosPciaTXE39Fq3vATttQFVrxU8lQ1isA39KgueYqXWxhVk115Nfypm-MdscneLh1LUeFwaDwJ_HdKqKLzjJygBNery-gHAk6WE3ROxWf0m9pfd7Te5pKM9l3axqboar03g6Mlat8dGhV31mbleQFzSxoSzOGTO4ObLb3L1xIxCTVBP6eD60PxhBogkW7MLnp96f7c0xOpys1kkqg8LvZyg"/><div class="flex items-center gap-space-sm"><span class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight">DevPulse AI</span><div class="flex items-center gap-space-xs bg-surface-container px-space-sm py-0.5 rounded-full"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span></span><span class="font-label-code-sm text-label-code-sm text-secondary-fixed-dim whitespace-nowrap hidden sm:inline">Local Session Active (Saved in Browser)</span></div><span class="font-label-code-sm text-label-code-sm bg-surface-container-high text-on-surface-variant px-space-xs py-0.5 rounded">v2.5</span></div></div><nav class="hidden xl:flex items-center bg-surface-container-low p-space-xs rounded-lg gap-space-xs" data-active-classes="bg-surface-container-highest text-on-surface font-semibold"><a aria-current="page" class="px-space-md py-space-xs rounded transition-all bg-surface-container-highest text-on-surface font-semibold" data-path="artifact-sandbox" href="#">⚡ Artifact Sandbox</a><a class="px-space-md py-space-xs rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-ui text-label-ui transition-all" data-path="prompt-benchmarker" href="#">🧪 Prompt Benchmarker</a><a class="px-space-md py-space-xs rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-ui text-label-ui transition-all" data-path="dev-utilities" href="#">🛠️ Dev Utilities</a></nav><div class="flex items-center gap-space-sm shrink-0"><div class="relative hidden lg:block"><select class="appearance-none bg-surface-container-low text-on-surface font-label-code-sm text-label-code-sm pl-space-md pr-space-xl py-space-xs rounded focus:outline-none cursor-pointer hover:bg-surface-container-high transition-colors"><option value="gemini-3.8-flash">Gemini 3.8 Flash (Free Auto-Rotator)</option><option value="groq-llama-70b">Groq Llama 3.3 70B</option><option value="gemini-4-argon">Gemini 4 Argon (🔑 BYOK Pro)</option></select><span class="material-symbols-outlined absolute right-space-xs top-1/2 -translate-y-1/2 pointer-events-none text-outline text-[16px]">expand_more</span></div><button class="flex items-center gap-space-xs bg-surface-container-high text-on-surface hover:bg-surface-bright hover:text-on-surface px-space-sm py-space-xs rounded font-label-code-sm text-label-code-sm transition-all" type="button"><span>🔑</span><span class="hidden md:inline">BYOK Settings</span></button><button class="flex items-center gap-space-xs bg-tertiary-container text-on-tertiary-container hover:bg-tertiary hover:text-on-tertiary px-space-sm py-space-xs rounded font-label-ui text-label-ui transition-all shadow-sm" type="button"><span>☕</span><span class="hidden sm:inline">Buy Coffee</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-14 bg-surface flex-1 flex flex-col"><div class="flex flex-col w-full">
+<!-- Split Workspace Container -->
+<div class="flex flex-col xl:flex-row w-full h-[calc(100vh-3.5rem-3rem)] overflow-hidden bg-surface">
+<!-- LEFT PANE: AI Prompt Synthesis & Multi-tab Code Editor (46%) -->
+<section class="w-full xl:w-[46%] flex flex-col bg-surface-container-lowest shrink-0">
+<!-- Top AI Prompt Bar -->
+<div class="p-space-md bg-surface-container-low flex flex-col gap-space-sm shadow-sm relative z-10">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[16px]">auto_awesome</span>
+<span class="font-label-ui text-label-ui text-on-surface-variant uppercase tracking-wider">AI Synthesis Engine</span>
+<span class="bg-primary-container/20 text-primary font-label-code-sm text-label-code-sm px-1.5 py-0.5 rounded">v3.8 Flash</span>
+</div>
+<div class="flex items-center gap-space-xs font-label-code-sm text-label-code-sm text-secondary">
+<span class="relative flex h-1.5 w-1.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-secondary"></span>
+</span>
+<span>GPU Ready</span>
+</div>
+</div>
+<!-- Input & Action Button -->
+<div class="flex items-center gap-space-xs bg-surface-container rounded-lg p-1 shadow-inner focus-within:ring-1 focus-within:ring-primary-container">
+<span class="material-symbols-outlined text-outline text-[18px] ml-space-xs">terminal</span>
+<input class="bg-transparent text-on-surface font-body-md text-body-md w-full px-space-xs py-1 focus:outline-none placeholder-outline selection:bg-primary-container" id="prompt-input" placeholder="Describe any frontend layout, component, or mini-app..." type="text" value="Build a high-converting obsidian dark mode SaaS Pricing Table with tiered switch"/>
+<button class="flex items-center gap-space-xs bg-primary-container hover:bg-primary text-on-primary font-label-ui text-label-ui px-space-md py-1.5 rounded transition-all shrink-0 shadow-[0_0_12px_rgba(128,131,255,0.4)]" id="synth-btn" type="button">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+<span>Generate UI</span>
+</button>
+</div>
+<!-- Preset Quick Prompts -->
+<div class="flex items-center gap-space-xs overflow-x-auto no-scrollbar pt-0.5">
+<span class="font-label-code-sm text-label-code-sm text-outline shrink-0">Presets:</span>
+<button class="bg-surface-container-high hover:bg-surface-bright text-primary font-label-code-sm text-label-code-sm px-2 py-0.5 rounded transition-colors whitespace-nowrap flex items-center gap-1 shadow-sm" onclick="setPrompt('Build a high-converting obsidian dark mode SaaS Pricing Table with tiered switch')" type="button">
+<span>💎</span> SaaS Pricing Table
+          </button>
+<button class="bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-code-sm text-label-code-sm px-2 py-0.5 rounded transition-colors whitespace-nowrap flex items-center gap-1" onclick="setPrompt('Create an ultra-dense real-time Crypto Analytics terminal with live order-book depth')" type="button">
+<span>📈</span> Crypto Dashboard
+          </button>
+<button class="bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-code-sm text-label-code-sm px-2 py-0.5 rounded transition-colors whitespace-nowrap flex items-center gap-1" onclick="setPrompt('Develop an atmospheric Pomodoro Timer with radial progress ring and sound toggle')" type="button">
+<span>⏱️</span> Pomodoro Timer
+          </button>
+</div>
+</div>
+<!-- Editor Window Header / Tabs -->
+<div class="bg-surface-container-lowest flex items-center justify-between px-space-sm pt-space-xs select-none">
+<div class="flex items-center gap-0.5" id="code-tabs">
+<button class="flex items-center gap-1.5 px-space-md py-1.5 bg-surface text-on-surface font-label-code-sm text-label-code-sm rounded-t transition-colors shadow-sm" id="tab-btn-html" onclick="switchTab('html')">
+<span class="text-tertiary">‹/›</span>
+<span>index.html</span>
+</button>
+<button class="flex items-center gap-1.5 px-space-md py-1.5 bg-surface-container-low text-on-surface-variant hover:text-on-surface font-label-code-sm text-label-code-sm rounded-t transition-colors" id="tab-btn-css" onclick="switchTab('css')">
+<span class="text-secondary">#</span>
+<span>styles.css</span>
+</button>
+<button class="flex items-center gap-1.5 px-space-md py-1.5 bg-surface-container-low text-on-surface-variant hover:text-on-surface font-label-code-sm text-label-code-sm rounded-t transition-colors" id="tab-btn-js" onclick="switchTab('js')">
+<span class="text-tertiary-fixed">{ }</span>
+<span>script.js</span>
+</button>
+</div>
+<div class="flex items-center gap-space-md pr-space-sm pb-1">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-label-code-sm text-label-code-sm text-secondary font-medium">Live Sync</span>
+</div>
+<span class="font-label-code-sm text-label-code-sm text-outline hidden sm:inline">UTF-8 · 2 spaces</span>
+</div>
+</div>
+<!-- Code Editor Canvas with Gutter -->
+<div class="flex-1 bg-surface-container-lowest overflow-y-auto font-label-code-md text-label-code-md flex select-text relative">
+<!-- Line Numbers Gutter -->
+<div class="w-10 bg-surface-container-lowest py-3 select-none flex flex-col items-end pr-2.5 text-outline-variant font-label-code-sm text-label-code-sm shrink-0">
+<span>01</span><span>02</span><span>03</span><span>04</span><span>05</span>
+<span>06</span><span>07</span><span>08</span><span>09</span><span>10</span>
+<span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+<span>16</span><span>17</span><span>18</span><span>19</span><span>20</span>
+<span>21</span><span>22</span><span>23</span><span>24</span><span>25</span>
+<span>26</span><span>27</span><span>28</span><span>29</span><span>30</span>
+</div>
+<!-- Syntax Code Content -->
+<div class="flex-1 py-3 px-space-md overflow-x-auto text-on-surface-variant leading-5 whitespace-pre" id="code-content">
+<span class="text-outline">&lt;!-- Obsidian SaaS Tiered Matrix --&gt;</span>
+<span class="text-primary">&lt;div</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"obsidian-wrapper w-full max-w-5xl mx-auto p-6"</span><span class="text-primary">&gt;</span>
+<span class="text-primary">&lt;div</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"tier-switcher flex items-center justify-center gap-3 mb-8"</span><span class="text-primary">&gt;</span>
+<span class="text-primary">&lt;span</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"text-xs font-semibold text-gray-400"</span><span class="text-primary">&gt;</span>Monthly<span class="text-primary">&lt;/span&gt;</span>
+<span class="text-primary">&lt;button</span> <span class="text-tertiary">id</span>=<span class="text-secondary">"billingToggle"</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"w-12 h-6 bg-indigo-900 rounded-full p-1"</span><span class="text-primary">&gt;</span>
+<span class="text-primary">&lt;div</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"w-4 h-4 bg-indigo-400 rounded-full shadow"</span><span class="text-primary">&gt;&lt;/div&gt;</span>
+<span class="text-primary">&lt;/button&gt;</span>
+<span class="text-primary">&lt;span</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"text-xs font-semibold text-white flex items-center gap-1"</span><span class="text-primary">&gt;</span>
+      Annual <span class="text-primary">&lt;span</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"badge bg-emerald-500/20 text-emerald-400 text-[10px]"</span><span class="text-primary">&gt;</span>Save 20%<span class="text-primary">&lt;/span&gt;</span>
+<span class="text-primary">&lt;/span&gt;</span>
+<span class="text-primary">&lt;/div&gt;</span>
+<span class="text-primary">&lt;div</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"grid grid-cols-1 md:grid-cols-3 gap-6"</span><span class="text-primary">&gt;</span>
+<span class="text-outline">&lt;!-- Tier 1: Starter --&gt;</span>
+<span class="text-primary">&lt;div</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"card bg-[#12141D] rounded-xl p-6 shadow-xl"</span><span class="text-primary">&gt;</span>
+<span class="text-primary">&lt;h3</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"text-base font-medium text-gray-300"</span><span class="text-primary">&gt;</span>Starter<span class="text-primary">&lt;/h3&gt;</span>
+<span class="text-primary">&lt;p</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"text-3xl font-bold text-white mt-3"</span><span class="text-primary">&gt;</span>$<span class="text-tertiary-fixed font-bold">19</span><span &gt;="" class="text-outline text-xs" mo<="" span=""><span class="text-primary">&lt;/p&gt;</span>
+<span class="text-primary">&lt;ul</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"mt-6 space-y-2.5 text-xs text-gray-400"</span><span class="text-primary">&gt;</span>
+<span class="text-primary">&lt;li&gt;</span>✓ 3 Team Seats<span class="text-primary">&lt;/li&gt;</span>
+<span class="text-primary">&lt;li&gt;</span>✓ 100K API Invocations<span class="text-primary">&lt;/li&gt;</span>
+<span class="text-primary">&lt;/ul&gt;</span>
+<span class="text-primary">&lt;/div&gt;</span>
+<span class="text-outline">&lt;!-- Tier 2: Pro (Active Focus) --&gt;</span>
+<span class="text-primary">&lt;div</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"card bg-[#161926] rounded-xl p-6 shadow-2xl relative"</span><span class="text-primary">&gt;</span>
+<span class="text-primary">&lt;span</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"badge-pill bg-indigo-500 text-white font-mono text-[10px]"</span><span class="text-primary">&gt;</span>RECOMMENDED<span class="text-primary">&lt;/span&gt;</span>
+<span class="text-primary">&lt;h3</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"text-base font-semibold text-white"</span><span class="text-primary">&gt;</span>Pro Scale<span class="text-primary">&lt;/h3&gt;</span>
+<span class="text-primary">&lt;p</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"text-3xl font-bold text-white mt-3"</span><span class="text-primary">&gt;</span>$<span class="text-primary-container font-bold">49</span><span &gt;="" class="text-outline text-xs" mo<="" span=""><span class="text-primary">&lt;/p&gt;</span>
+<span class="text-primary">&lt;button</span> <span class="text-tertiary">class</span>=<span class="text-secondary">"w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded mt-6"</span><span class="text-primary">&gt;</span>
+        Deploy Pro Instantly →
+      <span class="text-primary">&lt;/button&gt;</span>
+<span class="text-primary">&lt;/div&gt;</span>
+<span class="text-primary">&lt;/div&gt;</span>
+<span class="text-primary">&lt;/div&gt;</span></span></span></div>
+</div>
+<!-- Bottom Sponsored Slot: Neon DB Serverless Postgres -->
+<div class="p-space-sm bg-surface-container-low flex items-center justify-between gap-space-md shadow-md">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center shrink-0">
+<span class="text-secondary font-bold text-base">⚡</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-ui text-label-ui text-on-surface font-semibold truncate">Neon Serverless Postgres</span>
+<span class="bg-secondary/10 text-secondary font-label-code-sm text-label-code-sm px-1 rounded uppercase tracking-wider">Cloud DB</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">
+              Branch database environments like git code. Zero cold starts for AI agents.
+            </p>
+</div>
+</div>
+<a class="shrink-0 bg-secondary hover:bg-secondary-fixed text-on-secondary font-label-ui text-label-ui px-space-md py-1.5 rounded transition-all flex items-center gap-1 shadow-sm font-semibold" href="#">
+<span>Start Free</span>
+<span>→</span>
+</a>
+</div>
+</section>
+<!-- RIGHT PANE: Live Artifact Preview Bar & Interactive Render Runner (54%) -->
+<section class="w-full xl:w-[54%] flex flex-col bg-surface flex-1 overflow-hidden">
+<!-- Preview Control Toolbar -->
+<div class="px-space-md py-space-xs bg-surface-container-lowest flex flex-wrap items-center justify-between gap-y-2 shadow-sm relative z-20">
+<!-- Viewport Switcher & Render Mode -->
+<div class="flex items-center gap-space-sm">
+<div class="flex items-center bg-surface-container-low p-0.5 rounded">
+<button class="px-2 py-1 bg-surface-container-highest text-on-surface font-label-code-sm text-label-code-sm rounded flex items-center gap-1 transition-all shadow-sm" id="view-desktop" onclick="setViewport('desktop')" title="Desktop viewport">
+<span>🖥️</span>
+<span class="hidden md:inline">Desktop</span>
+<span class="text-outline text-[10px]">100%</span>
+</button>
+<button class="px-2 py-1 text-on-surface-variant hover:text-on-surface font-label-code-sm text-label-code-sm rounded flex items-center gap-1 transition-all" id="view-tablet" onclick="setViewport('tablet')" title="Tablet (768px)">
+<span>📟</span>
+<span class="hidden md:inline">Tablet</span>
+<span class="text-outline text-[10px]">768</span>
+</button>
+<button class="px-2 py-1 text-on-surface-variant hover:text-on-surface font-label-code-sm text-label-code-sm rounded flex items-center gap-1 transition-all" id="view-mobile" onclick="setViewport('mobile')" title="Mobile (375px)">
+<span>📱</span>
+<span class="hidden md:inline">Mobile</span>
+<span class="text-outline text-[10px]">375</span>
+</button>
+</div>
+<!-- Mode Toggle -->
+<div class="flex items-center bg-surface-container-low p-0.5 rounded">
+<button class="px-2 py-1 bg-surface-container-highest text-on-surface font-label-code-sm text-label-code-sm rounded flex items-center gap-1 transition-colors" id="btn-mode-render" onclick="toggleMode('render')">
+<span>👁️</span> Live
+            </button>
+<button class="px-2 py-1 text-on-surface-variant hover:text-on-surface font-label-code-sm text-label-code-sm rounded flex items-center gap-1 transition-colors" id="btn-mode-console" onclick="toggleMode('console')">
+<span>💻</span> Logs <span class="bg-primary/20 text-primary text-[10px] px-1 rounded">0</span>
+</button>
+</div>
+</div>
+<!-- Quick Actions & Deploy Button -->
+<div class="flex items-center gap-space-xs shrink-0">
+<button class="flex items-center gap-1 px-space-sm py-1 bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface rounded font-label-code-sm text-label-code-sm transition-colors" onclick="triggerToast('Markup copied to clipboard!')" title="Copy Code" type="button">
+<span>📋</span>
+<span class="hidden sm:inline">Copy</span>
+</button>
+<button class="flex items-center gap-1 px-space-sm py-1 bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface rounded font-label-code-sm text-label-code-sm transition-colors" onclick="triggerToast('Generated shareable sandbox URL!')" title="Share Sandbox" type="button">
+<span>🔗</span>
+<span class="hidden sm:inline">Share</span>
+</button>
+<button class="flex items-center gap-1 px-space-sm py-1 bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface rounded font-label-code-sm text-label-code-sm transition-colors" onclick="triggerToast('Artifact bundle exported (.zip)')" title="Export Source" type="button">
+<span>⬇️</span>
+<span class="hidden sm:inline">Export</span>
+</button>
+<button class="flex items-center gap-1.5 px-space-md py-1 bg-primary-container hover:bg-primary text-on-primary font-label-ui text-label-ui rounded shadow-[0_0_16px_rgba(128,131,255,0.45)] transition-all font-semibold" onclick="triggerToast('Deploying serverless edge instance...')" type="button">
+<span>🚀</span>
+<span>Deploy Live <span class="font-normal opacity-90 text-[10px] hidden sm:inline">($2.99/mo)</span></span>
+</button>
+</div>
+</div>
+<!-- Simulated Browser Address Bar -->
+<div class="px-space-md py-1 bg-surface-container-low flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-xs text-outline">
+<button class="hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[15px]">arrow_back</span></button>
+<button class="hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[15px]">arrow_forward</span></button>
+<button class="hover:text-on-surface transition-colors" onclick="reloadPreview()"><span class="material-symbols-outlined text-[15px]">refresh</span></button>
+</div>
+<div class="flex-1 max-w-xl mx-auto bg-surface-container-lowest rounded px-space-sm py-0.5 flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-1.5 overflow-hidden text-outline-variant font-label-code-sm text-label-code-sm truncate">
+<span class="material-symbols-outlined text-secondary text-[14px]">lock</span>
+<span class="text-on-surface font-medium truncate">https://devpulse.local/artifact/preview-8f92a</span>
+</div>
+<span class="material-symbols-outlined text-outline text-[14px] cursor-pointer hover:text-on-surface">content_copy</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="bg-secondary/10 text-secondary font-label-code-sm text-label-code-sm px-2 py-0.5 rounded flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+            Sandboxed DOM
+          </span>
+</div>
+</div>
+<!-- Live Render Stage (Sandboxed Container) -->
+<div class="flex-1 bg-surface p- space-md p-4 lg:p-6 overflow-y-auto flex items-start justify-center" id="viewport-stage">
+<!-- Interactive Preview Frame Wrapper -->
+<div class="w-full max-w-5xl transition-all duration-300 bg-surface-container-lowest rounded-xl shadow-2xl p-6 lg:p-10 flex flex-col items-center justify-center relative overflow-hidden" id="preview-container">
+<!-- Subtle Glow Backdrop in Preview -->
+<div class="absolute -top-32 -left-32 w-80 h-80 bg-primary-container/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute -bottom-32 -right-32 w-80 h-80 bg-secondary/10 rounded-full blur-3xl pointer-events-none"></div>
+<!-- Component Header Inside Artifact -->
+<div class="text-center max-w-2xl mx-auto mb-10 relative z-10">
+<div class="inline-flex items-center gap-2 bg-surface-container-high px-3 py-1 rounded-full mb-3 shadow-inner">
+<img alt="DevPulse AI Logo" class="w-3.5 h-3.5 rounded object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1WBEDScbAAg1YazfyDXhZgcg_Tt_n-UgBGDWlEVcJYBcB8qlbQHA8YLBSV3M73HEKPwXmt-c7ySaTxXNb0W293kdrGaHDplfTKMrbHpS5hjoyQNE7z7YBjD4dXnzTLLGuJLN9F1dViqfkMSwcgpQtOK44fmnP_vhKeWbWx50YUvqKHKi0tplQSkdzUfoQ5mmxz2aRsu1UL2glEScgY4ZXAbCU6cNfAmqTCYltbzJbI4zpGrMdpg7RxTKg"/>
+<span class="font-label-code-sm text-label-code-sm text-primary tracking-wide">PULSE CORE PRICING v2.4</span>
+</div>
+<h2 class="font-headline-xl text-headline-xl text-on-surface font-bold tracking-tight">
+              Predictable cloud compute for scaling teams
+            </h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">
+              Instant sandbox branches, isolated container pools, and sub-10ms global edge delivery.
+            </p>
+<!-- Tiered Billing Interactive Switcher -->
+<div class="mt-6 inline-flex items-center gap-3 bg-surface-container-low p-1.5 rounded-full shadow-md">
+<span class="font-label-ui text-label-ui px-3 py-1 text-on-surface-variant transition-colors cursor-pointer" id="monthly-label" onclick="setBilling('monthly')">
+                Monthly Billing
+              </span>
+<button class="w-12 h-6 bg-primary-container rounded-full p-1 relative flex items-center transition-colors focus:outline-none shadow-inner" id="billing-switch" onclick="toggleBilling()" type="button">
+<div class="w-4 h-4 rounded-full bg-on-primary transition-transform translate-x-6 shadow" id="switch-knob"></div>
+</button>
+<span class="font-label-ui text-label-ui px-3 py-1 text-on-surface font-semibold flex items-center gap-1.5 transition-colors cursor-pointer" id="yearly-label" onclick="setBilling('yearly')">
+<span>Annual Plan</span>
+<span class="bg-secondary/20 text-secondary font-label-code-sm text-label-code-sm px-1.5 py-0.5 rounded-full font-bold">Save 20%</span>
+</span>
+</div>
+</div>
+<!-- 3 Tier Pricing Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full relative z-10">
+<!-- Tier 1: Starter -->
+<div class="bg-surface-container rounded-xl p-6 flex flex-col justify-between shadow-lg hover:shadow-xl hover:bg-surface-container-high transition-all group">
+<div>
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-headline-md font-semibold text-on-surface">Starter</span>
+<span class="font-label-code-sm text-label-code-sm bg-surface-container-lowest text-outline px-2 py-0.5 rounded">Hobbyist</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">For independent developers &amp; prototyping.</p>
+<div class="mt-6 flex items-baseline gap-1">
+<span class="font-headline-xl text-headline-xl font-bold text-on-surface" id="price-starter">$15</span>
+<span class="font-label-code-sm text-label-code-sm text-outline" id="period-starter">/mo billed yearly</span>
+</div>
+<div class="mt-6 space-y-3 font-body-sm text-body-sm text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<span>1,000 Sandbox Run-minutes</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<span>2 Concurrent Isolated Nodes</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<span>Shared Community GPUs</span>
+</div>
+<div class="flex items-center gap-2 opacity-40">
+<span class="material-symbols-outlined text-outline text-[16px]">block</span>
+<span>Custom Edge Domains</span>
+</div>
+</div>
+</div>
+<button class="mt-8 w-full py-2 bg-surface-container-highest hover:bg-surface-bright text-on-surface font-label-ui text-label-ui rounded font-semibold transition-all shadow-sm">
+                Start Free 14-Day Trial
+              </button>
+</div>
+<!-- Tier 2: Pro (Scale - Recommended with Glowing Border) -->
+<div class="bg-surface-container-high rounded-xl p-6 flex flex-col justify-between shadow-2xl relative transition-all group hover:scale-[1.01] shadow-primary-container/20">
+<!-- Top Highlight Ribbon -->
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-container text-on-primary font-label-ui text-label-ui uppercase tracking-wider px-3 py-0.5 rounded-full font-bold shadow-md">
+                ⚡ Most Popular
+              </div>
+<div>
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-headline-md font-bold text-on-surface">Pro Scale</span>
+<span class="font-label-code-sm text-label-code-sm bg-primary/20 text-primary px-2 py-0.5 rounded font-semibold">Teams</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Full stack deployment with live telemetry.</p>
+<div class="mt-6 flex items-baseline gap-1">
+<span class="font-headline-xl text-headline-xl font-bold text-primary-container" id="price-pro">$39</span>
+<span class="font-label-code-sm text-label-code-sm text-outline" id="period-pro">/mo billed yearly</span>
+</div>
+<div class="mt-6 space-y-3 font-body-sm text-body-sm text-on-surface">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<span>Unlimited DevPulse Syntheses</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<span>Dedicated Argon &amp; Groq Llama Pipes</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<span>Persistent Neon DB Branches</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<span>Zero-latency Custom SSL Domains</span>
+</div>
+</div>
+</div>
+<button class="mt-8 w-full py-2 bg-primary-container hover:bg-primary text-on-primary font-label-ui text-label-ui rounded font-bold transition-all shadow-[0_0_16px_rgba(128,131,255,0.4)]">
+                Upgrade to Pro Scale →
+              </button>
+</div>
+<!-- Tier 3: Enterprise -->
+<div class="bg-surface-container rounded-xl p-6 flex flex-col justify-between shadow-lg hover:shadow-xl hover:bg-surface-container-high transition-all group">
+<div>
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-headline-md font-semibold text-on-surface">Enterprise</span>
+<span class="font-label-code-sm text-label-code-sm bg-surface-container-lowest text-tertiary px-2 py-0.5 rounded">Custom</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">For mission-critical production clusters.</p>
+<div class="mt-6 flex items-baseline gap-1">
+<span class="font-headline-xl text-headline-xl font-bold text-on-surface" id="price-enterprise">$159</span>
+<span class="font-label-code-sm text-label-code-sm text-outline" id="period-enterprise">/mo billed yearly</span>
+</div>
+<div class="mt-6 space-y-3 font-body-sm text-body-sm text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<span>Air-gapped VPC VPC-Peering</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<span>SSO, SAML &amp; SOC2 Audit Logs</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<span>Custom LLM Fine-tune Adapters</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<span>99.99% Edge SLA Guarantee</span>
+</div>
+</div>
+</div>
+<button class="mt-8 w-full py-2 bg-surface-container-highest hover:bg-surface-bright text-on-surface font-label-ui text-label-ui rounded font-semibold transition-all shadow-sm">
+                Talk to Enterprise Arch
+              </button>
+</div>
+</div>
+<!-- Feature Trust Badges -->
+<div class="mt-10 pt-6 w-full flex flex-wrap items-center justify-between gap-4 text-outline font-label-code-sm text-label-code-sm relative z-10">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-secondary">verified_user</span>
+<span>Encrypted at rest with AES-256</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-primary">speed</span>
+<span>Sub-second cold starts globally</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-tertiary">autorenew</span>
+<span>Cancel or downgrade anytime</span>
+</div>
+</div>
+</div>
+<!-- Simulated Logs Drawer (Hidden by default) -->
+<div class="hidden w-full max-w-5xl bg-surface-container-lowest rounded-xl p-4 font-label-code-md text-label-code-md shadow-2xl space-y-2" id="console-drawer">
+<div class="flex items-center justify-between text-outline text-label-code-sm">
+<span>Client Console Execution Log</span>
+<span class="text-secondary">● Listening</span>
+</div>
+<div class="text-secondary">[sandbox:init] Web Worker container mounted (pid: 4891)</div>
+<div class="text-on-surface-variant">[sandbox:asset] Tailwind runtime CSS injected: 114 utility rules parsed.</div>
+<div class="text-on-surface-variant">[sandbox:dom] Render tree hydrated with 42 nodes in 14.2ms.</div>
+<div class="text-primary">[engine:sync] Live hot-reload listener engaged on ws://localhost:7119</div>
+<div class="text-outline">[ready] Waiting for DOM user-input events...</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Toast Notification Overlay -->
+<div class="fixed bottom-14 right-6 z-50 transform translate-y-12 opacity-0 pointer-events-none transition-all duration-200 bg-surface-container-highest text-on-surface px-space-md py-space-sm rounded-lg shadow-2xl flex items-center gap-2 font-label-code-sm text-label-code-sm" id="toast-notification">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<span id="toast-message">Action successful</span>
+</div>
+</div>
+<script>
+  // Billing state switch
+  let isYearly = true;
+  function toggleBilling() {
+    setBilling(!isYearly ? 'yearly' : 'monthly');
+  }
+
+  function setBilling(mode) {
+    isYearly = (mode === 'yearly');
+    const knob = document.getElementById('switch-knob');
+    const monthlyLabel = document.getElementById('monthly-label');
+    const yearlyLabel = document.getElementById('yearly-label');
+    
+    const priceStarter = document.getElementById('price-starter');
+    const periodStarter = document.getElementById('period-starter');
+    const pricePro = document.getElementById('price-pro');
+    const periodPro = document.getElementById('period-pro');
+    const priceEnt = document.getElementById('price-enterprise');
+    const periodEnt = document.getElementById('period-enterprise');
+
+    if (isYearly) {
+      knob.classList.remove('translate-x-0');
+      knob.classList.add('translate-x-6');
+      monthlyLabel.classList.remove('text-on-surface', 'font-semibold');
+      monthlyLabel.classList.add('text-on-surface-variant');
+      yearlyLabel.classList.add('text-on-surface', 'font-semibold');
+      yearlyLabel.classList.remove('text-on-surface-variant');
+
+      priceStarter.innerText = '$15';
+      periodStarter.innerText = '/mo billed yearly';
+      pricePro.innerText = '$39';
+      periodPro.innerText = '/mo billed yearly';
+      priceEnt.innerText = '$159';
+      periodEnt.innerText = '/mo billed yearly';
+    } else {
+      knob.classList.add('translate-x-0');
+      knob.classList.remove('translate-x-6');
+      monthlyLabel.classList.add('text-on-surface', 'font-semibold');
+      monthlyLabel.classList.remove('text-on-surface-variant');
+      yearlyLabel.classList.remove('text-on-surface', 'font-semibold');
+      yearlyLabel.classList.add('text-on-surface-variant');
+
+      priceStarter.innerText = '$19';
+      periodStarter.innerText = '/mo monthly';
+      pricePro.innerText = '$49';
+      periodPro.innerText = '/mo monthly';
+      priceEnt.innerText = '$199';
+      periodEnt.innerText = '/mo monthly';
+    }
+  }
+
+  // Viewport Switcher
+  function setViewport(device) {
+    const container = document.getElementById('preview-container');
+    const btnDesktop = document.getElementById('view-desktop');
+    const btnTablet = document.getElementById('view-tablet');
+    const btnMobile = document.getElementById('view-mobile');
+
+    [btnDesktop, btnTablet, btnMobile].forEach(btn => {
+      btn.classList.remove('bg-surface-container-highest', 'text-on-surface', 'shadow-sm');
+      btn.classList.add('text-on-surface-variant');
+    });
+
+    if (device === 'desktop') {
+      container.style.maxWidth = '64rem'; // max-w-5xl
+      btnDesktop.classList.add('bg-surface-container-highest', 'text-on-surface', 'shadow-sm');
+    } else if (device === 'tablet') {
+      container.style.maxWidth = '768px';
+      btnTablet.classList.add('bg-surface-container-highest', 'text-on-surface', 'shadow-sm');
+    } else if (device === 'mobile') {
+      container.style.maxWidth = '375px';
+      btnMobile.classList.add('bg-surface-container-highest', 'text-on-surface', 'shadow-sm');
+    }
+  }
+
+  // Code Tab Switcher
+  function switchTab(tab) {
+    const tabs = ['html', 'css', 'js'];
+    tabs.forEach(t => {
+      const btn = document.getElementById('tab-btn-' + t);
+      if (t === tab) {
+        btn.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+        btn.classList.add('bg-surface', 'text-on-surface');
+      } else {
+        btn.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+        btn.classList.remove('bg-surface', 'text-on-surface');
+      }
+    });
+
+    const codeArea = document.getElementById('code-content');
+    if (tab === 'css') {
+      codeArea.innerHTML = `<span class="text-outline">/* Obsidian glassmorphism core */</span>
+<span class="text-tertiary">.obsidian-wrapper</span> {
+  <span class="text-primary">background</span>: <span class="text-secondary">#0d0e13</span>;
+  <span class="text-primary">backdrop-filter</span>: <span class="text-secondary">blur(12px)</span>;
+}
+
+<span class="text-tertiary">.card</span> {
+  <span class="text-primary">transition</span>: <span class="text-secondary">all 0.2s cubic-bezier(0.16, 1, 0.3, 1)</span>;
+  <span class="text-primary">box-shadow</span>: <span class="text-secondary">0 10px 30px -10px rgba(0,0,0,0.5)</span>;
+}
+
+<span class="text-tertiary">.badge-pill</span> {
+  <span class="text-primary">position</span>: <span class="text-secondary">absolute</span>;
+  <span class="text-primary">top</span>: <span class="text-secondary">-12px</span>;
+  <span class="text-primary">left</span>: <span class="text-secondary">50%</span>;
+  <span class="text-primary">transform</span>: <span class="text-secondary">translateX(-50%)</span>;
+}`;
+    } else if (tab === 'js') {
+      codeArea.innerHTML = `<span class="text-outline">// Artifact reactive tier toggler</span>
+<span class="text-tertiary-fixed">const</span> btn = <span class="text-primary">document</span>.getElementById(<span class="text-secondary">'billingToggle'</span>);
+<span class="text-tertiary-fixed">let</span> isAnnual = <span class="text-secondary">true</span>;
+
+btn.addEventListener(<span class="text-secondary">'click'</span>, () =&gt; {
+  isAnnual = !isAnnual;
+  <span class="text-tertiary-fixed">const</span> multiplier = isAnnual ? <span class="text-primary-container">0.8</span> : <span class="text-primary-container">1.0</span>;
+  <span class="text-primary">document</span>.querySelectorAll(<span class="text-secondary">'[data-base-price]'</span>).forEach(el =&gt; {
+    <span class="text-tertiary-fixed">const</span> base = parseFloat(el.dataset.basePrice);
+    el.innerText = <span class="text-secondary">\`$\${Math.round(base * multiplier)}\`</span>;
+  });
+});`;
+    } else {
+      location.reload();
+    }
+  }
+
+  // Toggle Live vs Logs
+  function toggleMode(mode) {
+    const preview = document.getElementById('preview-container');
+    const logs = document.getElementById('console-drawer');
+    const btnRender = document.getElementById('btn-mode-render');
+    const btnConsole = document.getElementById('btn-mode-console');
+
+    if (mode === 'render') {
+      preview.classList.remove('hidden');
+      logs.classList.add('hidden');
+      btnRender.classList.add('bg-surface-container-highest', 'text-on-surface');
+      btnRender.classList.remove('text-on-surface-variant');
+      btnConsole.classList.remove('bg-surface-container-highest', 'text-on-surface');
+      btnConsole.classList.add('text-on-surface-variant');
+    } else {
+      preview.classList.add('hidden');
+      logs.classList.remove('hidden');
+      btnConsole.classList.add('bg-surface-container-highest', 'text-on-surface');
+      btnConsole.classList.remove('text-on-surface-variant');
+      btnRender.classList.remove('bg-surface-container-highest', 'text-on-surface');
+      btnRender.classList.add('text-on-surface-variant');
+    }
+  }
+
+  // Preset setter
+  function setPrompt(val) {
+    document.getElementById('prompt-input').value = val;
+    triggerToast('Prompt injected: Ready to regenerate');
+  }
+
+  // Reload action
+  function reloadPreview() {
+    const container = document.getElementById('preview-container');
+    container.style.opacity = '0.3';
+    setTimeout(() => {
+      container.style.opacity = '1';
+      triggerToast('Sandbox frame hot-reloaded.');
+    }, 250);
+  }
+
+  // Toast feedback
+  function triggerToast(msg) {
+    const toast = document.getElementById('toast-notification');
+    const message = document.getElementById('toast-message');
+    message.innerText = msg;
+    toast.classList.remove('translate-y-12', 'opacity-0', 'pointer-events-none');
+    toast.classList.add('translate-y-0', 'opacity-100');
+    setTimeout(() => {
+      toast.classList.add('translate-y-12', 'opacity-0', 'pointer-events-none');
+      toast.classList.remove('translate-y-0', 'opacity-100');
+    }, 2400);
+  }
+
+  // Synthesize UI Button animation
+  document.getElementById('synth-btn').addEventListener('click', function() {
+    this.classList.add('scale-95');
+    setTimeout(() => this.classList.remove('scale-95'), 150);
+    reloadPreview();
+    triggerToast('Synthesizing pricing matrix with Gemini 3.8 Flash...');
+  });
+</script></main><footer class="w-full bg-surface-container-lowest z-40 shadow-[0_-1px_6px_rgba(0,0,0,0.3)]"><div class="h-12 w-full px-margin-desktop flex flex-col sm:flex-row items-center justify-between gap-space-xs"><div class="flex items-center gap-space-xs"><a class="font-label-code-sm text-label-code-sm text-on-surface-variant hover:text-secondary flex items-center gap-space-xs transition-colors" href="#"><span class="text-secondary font-semibold">🚀</span><span>Need lightning cloud compute? Deploy instant fullstack apps on Vercel &amp; Hostinger →</span></a></div><div class="flex items-center gap-space-md"><a class="font-label-ui text-label-ui text-outline hover:text-on-surface transition-colors" href="#">Privacy Policy</a><a class="font-label-ui text-label-ui text-outline hover:text-on-surface transition-colors" href="#">Terms of Service</a><a class="font-label-ui text-label-ui text-outline hover:text-on-surface transition-colors" href="#">Cookie Disclaimer</a><a class="font-label-ui text-label-ui text-outline hover:text-on-surface transition-colors" href="#">DMCA / Client-Side Execution Notice</a></div></div></footer></body></html>

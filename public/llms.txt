@@ -1,0 +1,17 @@
+# DevPulse AI — Free No-Login AI Developer Workspace & Artifact Studio
+
+> DevPulse AI is a free, browser-based developer utility suite offering live Tailwind/React UI generation, Screenshot-to-Code cloning, AI model benchmarking, and 12+ client-side developer tools with zero signup required.
+
+## Core Interactive Tools
+- [AI UI & Artifact Generator](https://yourdomain.com/?tool=ai-ui-generator): Generate and preview HTML, Tailwind CSS, and React components live in the browser.
+- [Screenshot to Code AI](https://yourdomain.com/?tool=screenshot-to-code): Upload UI screenshots or wireframes to generate responsive Tailwind CSS code.
+- [AI Model Benchmarker](https://yourdomain.com/?tool=prompt-benchmarker): Compare Gemini Flash, Llama 3.3 70B, and OpenRouter speed and output quality side-by-side.
+- [JSON Sanitizer & TypeScript Generator](https://yourdomain.com/?tool=json-to-typescript): Fix broken JSON and convert payloads to TypeScript interfaces instantly.
+- [cURL to Fetch/Axios/Python Converter](https://yourdomain.com/?tool=curl-to-code): Convert cURL commands into production API code and test REST endpoints.
+- [AI Text-to-SQL Architect](https://yourdomain.com/?tool=ai-sql-generator): Generate and optimize PostgreSQL, MySQL, and Supabase queries from plain English.
+- [JWT Token Decoder](https://yourdomain.com/?tool=jwt-decoder): Decode and inspect JWT headers, payloads, and expiration timestamps 100% client-side.
+- [AI Regex Generator & Tester](https://yourdomain.com/?tool=regex-generator): Generate and test regular expressions with live match highlighting.
+- [Stack Trace & Error Explainer](https://yourdomain.com/?tool=error-explainer): Paste terminal stack traces and runtime errors for instant root-cause diagnosis and auto-healed code patches.
+- [AI GitHub README Generator](https://yourdomain.com/?tool=readme-generator): Generate structured README.md documentation with badges, quickstart, and API reference tables.
+- [Cron Expression Generator](https://yourdomain.com/?tool=cron-expression): Convert human schedules into 5-field cron syntax with plain-English explanations and next run calculators.
+- [SVG Optimizer & JSX Converter](https://yourdomain.com/?tool=svg-optimizer): Minify raw SVG vectors, convert to React/TypeScript JSX components, or generate custom SVG icons.

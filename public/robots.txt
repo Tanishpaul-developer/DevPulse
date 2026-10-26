@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+
+# Explicitly allow AI Search & Answer Engine Crawlers for free organic citations
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+Sitemap: https://yourdomain.com/sitemap.xml
