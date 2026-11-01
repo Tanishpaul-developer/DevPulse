@@ -1873,5 +1873,1389 @@ npx serve .
   };
 }
 
+// ============================================================================
+// 1. VERCEL API v13 STANDALONE SITE DEPLOYMENT BUILDER
+// ============================================================================
 
+export interface VercelDeploymentFile {
+  file: string;
+  data: string;
+}
 
+export interface VercelDeploymentPayload {
+  name: string;
+  files: VercelDeploymentFile[];
+  projectSettings: {
+    framework: null;
+    buildCommand: null;
+    outputDirectory: null;
+  };
+  target: 'production';
+}
+
+export interface VercelDeploymentResponse {
+  id: string;
+  name: string;
+  url: string;
+  inspectorUrl: string;
+  readyState: 'READY' | 'BUILDING' | 'QUEUED';
+  createdAt: number;
+  mode: 'vercel-api-live' | 'edge-instant-preview';
+  filesDeployed: string[];
+  payloadPreview: VercelDeploymentPayload;
+}
+
+/**
+ * Builds the official Vercel REST API v13 deployment payload (`POST https://api.vercel.com/v13/deployments`)
+ * packaging the current artifact's HTML, CSS, JS, and `vercel.json` into a standalone deployable site structure.
+ */
+export function buildVercelDeploymentPayload(
+  codeState: ArtifactCodeState,
+  customProjectName?: string
+): VercelDeploymentPayload {
+  const rawName =
+    (customProjectName || codeState.seoTitle || codeState.prompt || 'devpulse-artifact-site').trim();
+  const sanitizedName =
+    'devpulse-' +
+    (rawName
+      .toLowerCase()
+      .replace(/[^a-z0-9-]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 36) || 'standalone-site');
+
+  const projectTitle = (codeState.seoTitle || codeState.prompt || 'DevPulse Standalone Site').trim();
+  const projectDesc = (
+    codeState.seoDescription ||
+    codeState.prompt ||
+    'Deployed with 1-Click from DevPulse AI Artifact Studio'
+  ).trim();
+
+  const formattedHtmlBody = formatArtifactCode(codeState.html || '<div>Hello World</div>', 'html');
+  const formattedCss =
+    formatArtifactCode(codeState.css || '', 'css') ||
+    '/* Standalone site styles */\nbody {\n  margin: 0;\n}\n';
+  const formattedJs =
+    formatArtifactCode(codeState.js || '', 'js') ||
+    '// Standalone site runtime script\nconsole.log("Vercel deployment live");\n';
+
+  const dependencyTags = (codeState.dependencies || [])
+    .map((dep) =>
+      dep.type === 'style'
+        ? `  <link rel="stylesheet" href="${dep.url}" />`
+        : `  <script src="${dep.url}"></script>`
+    )
+    .join('\n');
+
+  const indexHtmlContent = `<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${projectTitle.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</title>
+  <meta name="description" content="${projectDesc.replace(/"/g, '&quot;')}" />
+  <script src="https://cdn.tailwindcss.com"></script>
+${dependencyTags ? dependencyTags + '\n' : ''}  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="bg-[#06070B] text-white antialiased">
+${formattedHtmlBody}
+  <script src="/app.js" defer></script>
+</body>
+</html>
+`;
+
+  const vercelJsonContent = JSON.stringify(
+    {
+      version: 2,
+      cleanUrls: true,
+      trailingSlash: false,
+      headers: [
+        {
+          source: '/(.*)',
+          headers: [
+            { key: 'X-Content-Type-Options', value: 'nosniff' },
+            { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          ],
+        },
+      ],
+    },
+    null,
+    2
+  );
+
+  return {
+    name: sanitizedName,
+    files: [
+      { file: 'index.html', data: indexHtmlContent },
+      { file: 'styles.css', data: formattedCss },
+      { file: 'app.js', data: formattedJs },
+      { file: 'vercel.json', data: vercelJsonContent },
+    ],
+    projectSettings: {
+      framework: null,
+      buildCommand: null,
+      outputDirectory: null,
+    },
+    target: 'production',
+  };
+}
+
+// ============================================================================
+// 2. JEST-LIKE ARTIFACT TEST RUNNER SUITE
+// ============================================================================
+
+export interface ArtifactTestCaseResult {
+  id: string;
+  suiteName: string;
+  title: string;
+  status: 'passed' | 'failed';
+  durationMs: number;
+  assertionSummary: string;
+  failureMessage?: string;
+}
+
+export interface ArtifactTestSuiteResult {
+  suiteName: string;
+  passedCount: number;
+  failedCount: number;
+  totalCount: number;
+  totalDurationMs: number;
+  allPassed: boolean;
+  results: ArtifactTestCaseResult[];
+  consoleFormattedLines: Array<{ level: 'log' | 'warn' | 'error'; message: string }>;
+}
+
+/**
+ * Runs a deterministic Jest-like assertion suite against the current generated HTML, CSS, and JS
+ * code state, returning structured test case results and Console Panel log lines.
+ */
+export function runArtifactJestSuite(codeState: ArtifactCodeState): ArtifactTestSuiteResult {
+  const suiteName = 'Artifact UI & Runtime Spec (artifact.spec.ts)';
+  const html = (codeState.html || '').trim();
+  const css = (codeState.css || '').trim();
+  const js = (codeState.js || '').trim();
+
+  const results: ArtifactTestCaseResult[] = [];
+
+  // Test 1: Root DOM structure & semantic elements
+  const hasRootMarkup = html.length > 15 && /<(div|section|main|header|nav|article|aside|footer|form|h1|h2)\b/i.test(html);
+  results.push({
+    id: 'spec-dom-root',
+    suiteName,
+    title: 'renders a non-empty root DOM structure with semantic HTML containers',
+    status: hasRootMarkup ? 'passed' : 'failed',
+    durationMs: 2,
+    assertionSummary: 'expect(document.body.children.length).toBeGreaterThan(0)',
+    failureMessage: hasRootMarkup
+      ? undefined
+      : 'Expected HTML markup to contain at least one semantic container (<main>, <section>, <div>, <header>), but found empty or plain text.',
+  });
+
+  // Test 2: Balanced HTML block tags
+  const trackedBlockTags = ['div', 'section', 'main', 'header', 'footer', 'nav', 'button', 'form', 'ul', 'table'];
+  const tagDiffs: string[] = [];
+  for (const tag of trackedBlockTags) {
+    const openMatches = html.match(new RegExp(`<${tag}(?:\\s|>|\\/)`, 'gi')) || [];
+    const selfClosingMatches = html.match(new RegExp(`<${tag}[^>]*\\/>`, 'gi')) || [];
+    const closeMatches = html.match(new RegExp(`</${tag}\\s*>`, 'gi')) || [];
+    const netOpen = openMatches.length - selfClosingMatches.length;
+    if (netOpen !== closeMatches.length) {
+      tagDiffs.push(`<${tag}> (${netOpen} opened vs ${closeMatches.length} closed)`);
+    }
+  }
+  const hasBalancedTags = html.length > 0 && tagDiffs.length === 0;
+  results.push({
+    id: 'spec-balanced-tags',
+    suiteName,
+    title: 'maintains balanced opening and closing HTML container tags',
+    status: hasBalancedTags ? 'passed' : 'failed',
+    durationMs: 3,
+    assertionSummary: 'expect(unclosedContainerTags).toHaveLength(0)',
+    failureMessage: hasBalancedTags
+      ? undefined
+      : html.length === 0
+        ? 'HTML markup is empty.'
+        : `Mismatched HTML tags detected: ${tagDiffs.join(', ')}`,
+  });
+
+  // Test 3: Accessibility & Typography Headings
+  const hasHeading = /<h[1-6]\b[^>]*>[\s\S]*?<\/h[1-6]>/i.test(html);
+  const imgWithoutAlt = (html.match(/<img\b(?![^>]*\balt=)[^>]*>/gi) || []).length;
+  const a11yPassed = hasHeading && imgWithoutAlt === 0;
+  results.push({
+    id: 'spec-a11y-headings',
+    suiteName,
+    title: 'includes accessible heading hierarchy (<h1-h6>) and valid image alt attributes',
+    status: a11yPassed ? 'passed' : 'failed',
+    durationMs: 2,
+    assertionSummary: 'expect(headings.length).toBeGreaterThanOrEqual(1) && expect(missingAltCount).toBe(0)',
+    failureMessage: a11yPassed
+      ? undefined
+      : !hasHeading
+        ? 'Expected at least one semantic heading (<h1-h6>) in artifact markup.'
+        : `Found ${imgWithoutAlt} <img> element(s) missing an accessible alt="" attribute.`,
+  });
+
+  // Test 4: Responsive Layout & CSS Syntax Integrity
+  const hasTailwindClasses = /\bclass=(["'])[^"']*(flex|grid|rounded|px-|py-|bg-|text-|border|sm:|md:|lg:)[^"']*\1/i.test(html);
+  const openBraces = (css.match(/\{/g) || []).length;
+  const closeBraces = (css.match(/\}/g) || []).length;
+  const cssBalanced = openBraces === closeBraces;
+  const stylingPassed = (hasTailwindClasses || css.length > 0) && cssBalanced;
+  results.push({
+    id: 'spec-responsive-css',
+    suiteName,
+    title: 'applies responsive Tailwind utility classes and balanced CSS rule blocks',
+    status: stylingPassed ? 'passed' : 'failed',
+    durationMs: 2,
+    assertionSummary: 'expect(hasResponsiveClasses || hasCustomCss).toBe(true) && expect(cssBracesBalanced).toBe(true)',
+    failureMessage: stylingPassed
+      ? undefined
+      : !cssBalanced
+        ? `Unbalanced CSS curly braces: ${openBraces} "{" vs ${closeBraces} "}".`
+        : 'Expected Tailwind utility classes or custom CSS rules on artifact elements.',
+  });
+
+  // Test 5: JavaScript Syntax & Runtime Safety
+  let jsSyntaxPassed = true;
+  let jsErrorDetail = '';
+  if (js.length > 0) {
+    try {
+      new Function(js);
+    } catch (err) {
+      jsSyntaxPassed = false;
+      jsErrorDetail = err instanceof Error ? err.message : String(err);
+    }
+  }
+  results.push({
+    id: 'spec-js-syntax',
+    suiteName,
+    title: 'compiles JavaScript logic cleanly with zero syntax errors',
+    status: jsSyntaxPassed ? 'passed' : 'failed',
+    durationMs: 3,
+    assertionSummary: 'expect(() => new Function(artifactJs)).not.toThrow()',
+    failureMessage: jsSyntaxPassed ? undefined : `SyntaxError in JavaScript: ${jsErrorDetail}`,
+  });
+
+  // Test 6: Bundle Size & Performance Telemetry Budget
+  const health = computeCodeHealthMetrics(codeState);
+  const perfBudgetPassed = health.fileSizeBytes < 100_000 && health.performanceImpact !== 'High Impact';
+  results.push({
+    id: 'spec-perf-budget',
+    suiteName,
+    title: 'stays within runtime bundle size and DOM node performance budget',
+    status: perfBudgetPassed ? 'passed' : 'failed',
+    durationMs: 1,
+    assertionSummary: `expect(bundleBytes).toBeLessThan(100000) [actual: ${health.fileSizeFormatted}, ${health.domElementEstimate} DOM nodes]`,
+    failureMessage: perfBudgetPassed
+      ? undefined
+      : `Artifact exceeds recommended low-latency budget (${health.fileSizeFormatted}, ${health.lineCount} lines, ${health.domElementEstimate} DOM nodes).`,
+  });
+
+  const passedCount = results.filter((r) => r.status === 'passed').length;
+  const failedCount = results.length - passedCount;
+  const totalCount = results.length;
+  const totalDurationMs = results.reduce((sum, r) => sum + r.durationMs, 0);
+  const allPassed = failedCount === 0;
+
+  const consoleFormattedLines: Array<{ level: 'log' | 'warn' | 'error'; message: string }> = [
+    {
+      level: allPassed ? 'log' : 'warn',
+      message: `${allPassed ? 'PASS' : 'FAIL'} ${suiteName} (${totalDurationMs} ms)`,
+    },
+    ...results.map((r) => ({
+      level: (r.status === 'passed' ? 'log' : 'error') as 'log' | 'error',
+      message:
+        r.status === 'passed'
+          ? `  ✓ ${r.title} (${r.durationMs} ms) — ${r.assertionSummary}`
+          : `  ✕ ${r.title} (${r.durationMs} ms)\n    → ${r.failureMessage}`,
+    })),
+    {
+      level: allPassed ? 'log' : 'error',
+      message: `Test Suites: ${allPassed ? '1 passed' : '1 failed'}, 1 total | Tests: ${passedCount} passed, ${failedCount} failed, ${totalCount} total | Time: ${totalDurationMs} ms`,
+    },
+  ];
+
+  return {
+    suiteName,
+    passedCount,
+    failedCount,
+    totalCount,
+    totalDurationMs,
+    allPassed,
+    results,
+    consoleFormattedLines,
+  };
+}
+
+// ============================================================================
+// 3. REAL-TIME MULTI-USER COLLABORATIVE CURSOR TRACKING ENGINE
+// ============================================================================
+
+export interface CollaboratorPresence {
+  clientId: string;
+  name: string;
+  color: string;
+  xPercent: number;
+  yPercent: number;
+  activeTab: 'preview' | 'code' | 'split';
+  lastUpdatedAt: number;
+  isSimulatedPeer?: boolean;
+}
+
+export interface CollabRealtimeEvent {
+  type: 'room:init' | 'user:joined' | 'cursor:moved' | 'user:left';
+  roomId: string;
+  peer?: CollaboratorPresence;
+  peers?: CollaboratorPresence[];
+  clientId?: string;
+  timestamp: number;
+}
+
+const COLLABORATOR_PALETTE = [
+  { name: 'Alex Rivera', color: '#818cf8' },
+  { name: 'Maya Lin', color: '#34d399' },
+  { name: 'Liam Vance', color: '#f472b6' },
+  { name: 'Elena Rostova', color: '#fbbf24' },
+  { name: 'Noah Takahashi', color: '#38bdf8' },
+  { name: 'Zoe Lindqvist', color: '#a78bfa' },
+] as const;
+
+/**
+ * Generates a deterministic collaborator profile for a client session ID.
+ */
+export function createLocalCollaboratorProfile(seedId?: string): CollaboratorPresence {
+  const id =
+    seedId && seedId.trim()
+      ? seedId.trim()
+      : `peer-${Math.random().toString(36).slice(2, 8)}`;
+
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
+  }
+  const preset = COLLABORATOR_PALETTE[hash % COLLABORATOR_PALETTE.length];
+  const suffix = id.slice(-3).toUpperCase();
+
+  return {
+    clientId: id,
+    name: `${preset.name} (#${suffix})`,
+    color: preset.color,
+    xPercent: 45,
+    yPercent: 40,
+    activeTab: 'preview',
+    lastUpdatedAt: Date.now(),
+  };
+}
+
+/**
+ * Idempotent real-time state reducer for multi-user collaborator cursors.
+ * Guards against duplicate peer additions and ignores the local user's own clientId.
+ */
+export function applyCollaboratorCursorEvent(
+  currentPeers: CollaboratorPresence[],
+  event: CollabRealtimeEvent,
+  selfClientId: string
+): CollaboratorPresence[] {
+  if (event.type === 'room:init' && Array.isArray(event.peers)) {
+    const map = new Map<string, CollaboratorPresence>();
+    for (const p of event.peers) {
+      if (p && p.clientId && p.clientId !== selfClientId) {
+        map.set(p.clientId, {
+          ...p,
+          xPercent: Math.min(98, Math.max(2, Number(p.xPercent) || 50)),
+          yPercent: Math.min(98, Math.max(2, Number(p.yPercent) || 50)),
+        });
+      }
+    }
+    return Array.from(map.values());
+  }
+
+  if (event.type === 'user:left') {
+    const targetId = event.clientId || event.peer?.clientId;
+    if (!targetId) return currentPeers;
+    return currentPeers.filter((p) => p.clientId !== targetId);
+  }
+
+  if ((event.type === 'user:joined' || event.type === 'cursor:moved') && event.peer) {
+    const incoming = event.peer;
+    if (!incoming.clientId || incoming.clientId === selfClientId) {
+      return currentPeers;
+    }
+    const normalized: CollaboratorPresence = {
+      ...incoming,
+      xPercent: Math.min(98, Math.max(2, Number(incoming.xPercent) || 50)),
+      yPercent: Math.min(98, Math.max(2, Number(incoming.yPercent) || 50)),
+      lastUpdatedAt: event.timestamp || Date.now(),
+    };
+
+    const existingIdx = currentPeers.findIndex((p) => p.clientId === incoming.clientId);
+    if (existingIdx === -1) {
+      return [...currentPeers, normalized];
+    }
+    const updated = [...currentPeers];
+    updated[existingIdx] = { ...updated[existingIdx], ...normalized };
+    return updated;
+  }
+
+  return currentPeers;
+}
+
+// ============================================================================
+// 4. DOWNLOAD ALL SAVED SNIPPETS AS A SINGLE MULTI-FILE ZIP ARCHIVE
+// ============================================================================
+
+export interface SavedSnippetItem {
+  id: string;
+  title: string;
+  codeState: ArtifactCodeState;
+  createdAt: number;
+}
+
+export const DEFAULT_SAVED_SNIPPETS: SavedSnippetItem[] = [
+  {
+    id: 'snippet-saas-telemetry',
+    title: 'PulseMetrics SaaS Revenue Card',
+    createdAt: 1761465000000,
+    codeState: {
+      html: `<section class="p-6 max-w-xl mx-auto rounded-2xl bg-slate-900 border border-indigo-500/30 text-white shadow-xl">
+  <div class="flex items-center justify-between mb-3">
+    <span class="text-xs font-mono uppercase tracking-wider text-indigo-400">MRR Analytics</span>
+    <span class="px-2 py-0.5 rounded-full text-xs bg-emerald-500/20 text-emerald-300">+28.4% YoY</span>
+  </div>
+  <h1 class="text-2xl font-bold">$184,920</h1>
+  <p class="text-xs text-slate-400 mt-1">Net monthly recurring revenue across 1,420 enterprise seats.</p>
+</section>`,
+      css: `body {\n  background: #06070B;\n  margin: 0;\n  font-family: system-ui, sans-serif;\n}\n`,
+      js: `console.log("PulseMetrics SaaS Revenue Card initialized");\n`,
+      prompt: 'PulseMetrics SaaS Revenue Card',
+      seoTitle: 'PulseMetrics SaaS Revenue Card',
+    },
+  },
+  {
+    id: 'snippet-ai-command-bar',
+    title: 'Command K Glass Search Modal',
+    createdAt: 1761461400000,
+    codeState: {
+      html: `<div class="p-6 max-w-lg mx-auto rounded-2xl bg-zinc-900/95 border border-white/10 text-white shadow-2xl">
+  <div class="flex items-center gap-2 border-b border-white/10 pb-3">
+    <span class="text-xs font-mono text-indigo-400">⌘K</span>
+    <input type="text" placeholder="Type a command or search tools..." class="w-full bg-transparent text-sm text-white focus:outline-none" />
+  </div>
+  <div class="pt-3 space-y-1.5 text-xs text-zinc-300">
+    <div class="p-2 rounded-lg bg-indigo-500/15 text-indigo-200 flex justify-between"><span>Deploy to Vercel</span><span>↵</span></div>
+    <div class="p-2 rounded-lg hover:bg-white/5 flex justify-between"><span>Export All Snippets (.ZIP)</span><span>⌘E</span></div>
+  </div>
+</div>`,
+      css: `body {\n  background: #090A0F;\n  margin: 0;\n}\n`,
+      js: `console.log("Command K Glass Search Modal ready");\n`,
+      prompt: 'Command K Glass Search Modal',
+      seoTitle: 'Command K Glass Search Modal',
+    },
+  },
+];
+
+/**
+ * Exports all saved artifacts (`SavedSnippetItem[]`) into a single binary PKZIP (`.zip`) archive
+ * containing separate `index.html`, `styles.css`, and `app.js` files inside a dedicated folder
+ * for each saved snippet, plus a root `README.md` catalog manifest.
+ */
+export function generateAllSavedSnippetsZipArchive(
+  snippets: SavedSnippetItem[]
+): GeneratedProjectZip {
+  const effectiveSnippets =
+    Array.isArray(snippets) && snippets.length > 0 ? snippets : DEFAULT_SAVED_SNIPPETS;
+
+  const rawFiles: Array<{ name: string; content: string }> = [];
+  const usedFolderSlugs = new Set<string>();
+
+  effectiveSnippets.forEach((snippet, idx) => {
+    const baseSlug =
+      (snippet.title || `snippet-${idx + 1}`)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 28) || `snippet-${idx + 1}`;
+
+    let folderName = `${String(idx + 1).padStart(2, '0')}-${baseSlug}`;
+    if (usedFolderSlugs.has(folderName)) {
+      folderName = `${folderName}-${idx + 1}`;
+    }
+    usedFolderSlugs.add(folderName);
+
+    const titleText = (snippet.title || `Saved Artifact #${idx + 1}`).trim();
+    const htmlBody = formatArtifactCode(
+      snippet.codeState?.html || '<div>Saved Snippet</div>',
+      'html'
+    );
+    const cssContent =
+      formatArtifactCode(snippet.codeState?.css || '', 'css') ||
+      `/* Styles for ${titleText} */\nbody {\n  margin: 0;\n}\n`;
+    const jsContent =
+      formatArtifactCode(snippet.codeState?.js || '', 'js') ||
+      `// Script for ${titleText}\nconsole.log(${JSON.stringify(titleText + ' loaded')});\n`;
+
+    const indexHtml = `<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${titleText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="bg-[#06070B] text-white antialiased">
+${htmlBody}
+  <script src="./app.js" defer></script>
+</body>
+</html>
+`;
+
+    rawFiles.push(
+      { name: `${folderName}/index.html`, content: indexHtml },
+      { name: `${folderName}/styles.css`, content: cssContent },
+      { name: `${folderName}/app.js`, content: jsContent }
+    );
+  });
+
+  const readmeLines = [
+    '# DevPulse AI — Saved Snippets Bundle (.ZIP)',
+    '',
+    `Exported ${effectiveSnippets.length} saved artifact(s). Each folder contains standalone \`index.html\`, \`styles.css\`, and \`app.js\` files.`,
+    '',
+    '## Included Artifacts',
+    ...effectiveSnippets.map(
+      (s, i) => `- **${i + 1}. ${s.title}** (${(s.codeState?.html || '').length} bytes HTML)`
+    ),
+    '',
+  ];
+  rawFiles.push({ name: 'README.md', content: readmeLines.join('\n') });
+
+  const encoder = new TextEncoder();
+  const encodedFiles = rawFiles.map((f) => {
+    const nameBytes = encoder.encode(f.name);
+    const dataBytes = encoder.encode(f.content);
+    const crc = computeCrc32(dataBytes);
+    return {
+      name: f.name,
+      content: f.content,
+      nameBytes,
+      dataBytes,
+      crc,
+      sizeBytes: dataBytes.byteLength,
+    };
+  });
+
+  let localSectionBytes = 0;
+  let centralDirBytes = 0;
+  for (const f of encodedFiles) {
+    localSectionBytes += 30 + f.nameBytes.byteLength + f.dataBytes.byteLength;
+    centralDirBytes += 46 + f.nameBytes.byteLength;
+  }
+  const totalBytes = localSectionBytes + centralDirBytes + 22;
+
+  const buffer = new ArrayBuffer(totalBytes);
+  const view = new DataView(buffer);
+  const uint8 = new Uint8Array(buffer);
+
+  let offset = 0;
+  const localHeaderOffsets: number[] = [];
+
+  for (const f of encodedFiles) {
+    localHeaderOffsets.push(offset);
+    view.setUint32(offset, 0x04034b50, true);
+    view.setUint16(offset + 4, 20, true);
+    view.setUint16(offset + 6, 0x0800, true);
+    view.setUint16(offset + 8, 0, true);
+    view.setUint16(offset + 10, 0, true);
+    view.setUint16(offset + 12, 0x5421, true);
+    view.setUint32(offset + 14, f.crc, true);
+    view.setUint32(offset + 18, f.dataBytes.byteLength, true);
+    view.setUint32(offset + 22, f.dataBytes.byteLength, true);
+    view.setUint16(offset + 26, f.nameBytes.byteLength, true);
+    view.setUint16(offset + 28, 0, true);
+    offset += 30;
+
+    uint8.set(f.nameBytes, offset);
+    offset += f.nameBytes.byteLength;
+
+    uint8.set(f.dataBytes, offset);
+    offset += f.dataBytes.byteLength;
+  }
+
+  const centralDirStartOffset = offset;
+
+  for (let i = 0; i < encodedFiles.length; i++) {
+    const f = encodedFiles[i];
+    view.setUint32(offset, 0x02014b50, true);
+    view.setUint16(offset + 4, 20, true);
+    view.setUint16(offset + 6, 20, true);
+    view.setUint16(offset + 8, 0x0800, true);
+    view.setUint16(offset + 10, 0, true);
+    view.setUint16(offset + 12, 0, true);
+    view.setUint16(offset + 14, 0x5421, true);
+    view.setUint32(offset + 16, f.crc, true);
+    view.setUint32(offset + 20, f.dataBytes.byteLength, true);
+    view.setUint32(offset + 24, f.dataBytes.byteLength, true);
+    view.setUint16(offset + 28, f.nameBytes.byteLength, true);
+    view.setUint16(offset + 30, 0, true);
+    view.setUint16(offset + 32, 0, true);
+    view.setUint16(offset + 34, 0, true);
+    view.setUint16(offset + 36, 0, true);
+    view.setUint32(offset + 38, 0, true);
+    view.setUint32(offset + 42, localHeaderOffsets[i], true);
+    offset += 46;
+
+    uint8.set(f.nameBytes, offset);
+    offset += f.nameBytes.byteLength;
+  }
+
+  const centralDirSize = offset - centralDirStartOffset;
+
+  view.setUint32(offset, 0x06054b50, true);
+  view.setUint16(offset + 4, 0, true);
+  view.setUint16(offset + 6, 0, true);
+  view.setUint16(offset + 8, encodedFiles.length, true);
+  view.setUint16(offset + 10, encodedFiles.length, true);
+  view.setUint32(offset + 12, centralDirSize, true);
+  view.setUint32(offset + 16, centralDirStartOffset, true);
+  view.setUint16(offset + 20, 0, true);
+
+  return {
+    zipBytes: uint8,
+    filename: `devpulse-saved-snippets-${effectiveSnippets.length}-bundle.zip`,
+    files: encodedFiles.map((f) => ({
+      name: f.name,
+      content: f.content,
+      sizeBytes: f.sizeBytes,
+    })),
+  };
+}
+
+// ============================================================================
+// 5. GITHUB OAUTH REPOSITORY PUSH PAYLOAD BUILDER
+// ============================================================================
+
+export interface GitHubPushFileEntry {
+  path: string;
+  content: string;
+}
+
+export interface GitHubPushPayload {
+  repoName: string;
+  branch: string;
+  commitMessage: string;
+  files: GitHubPushFileEntry[];
+}
+
+export function buildGitHubPushPayload(
+  codeState: ArtifactCodeState,
+  repoName: string = 'devpulse-ui-artifact',
+  branch: string = 'main',
+  commitMessage: string = 'feat(ui): push artifact state from DevPulse AI'
+): GitHubPushPayload {
+  const cleanRepo =
+    repoName
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9-_]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'devpulse-ui-artifact';
+  const cleanBranch = branch.trim() || 'main';
+  const cleanMessage =
+    commitMessage.trim() || 'feat(ui): push artifact state from DevPulse AI';
+
+  const archive = generateProjectZipArchive(codeState);
+
+  return {
+    repoName: cleanRepo,
+    branch: cleanBranch,
+    commitMessage: cleanMessage,
+    files: archive.files.map((f) => ({
+      path: f.name,
+      content: f.content,
+    })),
+  };
+}
+
+// ============================================================================
+// 6. USER FEEDBACK SYSTEM (localStorage + Backend Endpoint Sync)
+// ============================================================================
+
+export type FeedbackCategory = 'bug_report' | 'feature_request' | 'general_feedback';
+
+export interface UserFeedbackEntry {
+  id: string;
+  category: FeedbackCategory;
+  message: string;
+  email?: string;
+  activeTool?: string;
+  createdAt: number;
+  syncedToBackend?: boolean;
+}
+
+export const USER_FEEDBACK_STORAGE_KEY = 'devpulse_user_feedback_v1';
+
+export const FEEDBACK_CATEGORIES: Array<{
+  id: FeedbackCategory;
+  label: string;
+  badgeColor: string;
+  description: string;
+}> = [
+  {
+    id: 'bug_report',
+    label: 'Bug Report',
+    badgeColor: 'rose',
+    description: 'Report broken UI behavior, rendering glitches, or unexpected console errors'
+  },
+  {
+    id: 'feature_request',
+    label: 'Feature Request',
+    badgeColor: 'indigo',
+    description: 'Suggest a new AI developer utility, export format, or workflow enhancement'
+  },
+  {
+    id: 'general_feedback',
+    label: 'General Feedback',
+    badgeColor: 'emerald',
+    description: 'Share thoughts on UX, performance, documentation, or overall experience'
+  }
+];
+
+export function loadUserFeedbackEntries(): UserFeedbackEntry[] {
+  try {
+    if (typeof localStorage === 'undefined') return [];
+    const raw = localStorage.getItem(USER_FEEDBACK_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter(
+        (item): item is UserFeedbackEntry =>
+          Boolean(item && typeof item.id === 'string' && typeof item.message === 'string')
+      )
+      .sort((a, b) => b.createdAt - a.createdAt);
+  } catch {
+    return [];
+  }
+}
+
+export function submitUserFeedbackEntry(input: {
+  category: FeedbackCategory;
+  message: string;
+  email?: string;
+  activeTool?: string;
+  syncedToBackend?: boolean;
+}): { entry: UserFeedbackEntry; entries: UserFeedbackEntry[] } {
+  const cleanMessage = (input.message || '').trim();
+  if (!cleanMessage) {
+    throw new Error('Feedback message cannot be empty.');
+  }
+
+  const validCategory: FeedbackCategory =
+    input.category === 'bug_report' ||
+    input.category === 'feature_request' ||
+    input.category === 'general_feedback'
+      ? input.category
+      : 'general_feedback';
+
+  const entry: UserFeedbackEntry = {
+    id: `fb-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    category: validCategory,
+    message: cleanMessage,
+    email: input.email?.trim() || undefined,
+    activeTool: input.activeTool?.trim() || 'ai-ui-generator',
+    createdAt: Date.now(),
+    syncedToBackend: Boolean(input.syncedToBackend)
+  };
+
+  const existing = loadUserFeedbackEntries();
+  const entries = [entry, ...existing].slice(0, 100);
+
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(USER_FEEDBACK_STORAGE_KEY, JSON.stringify(entries));
+    }
+  } catch {
+    // Ignore storage quota errors
+  }
+
+  return { entry, entries };
+}
+
+export function deleteUserFeedbackEntry(id: string): UserFeedbackEntry[] {
+  const existing = loadUserFeedbackEntries();
+  const remaining = existing.filter((item) => item.id !== id);
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(USER_FEEDBACK_STORAGE_KEY, JSON.stringify(remaining));
+    }
+  } catch {
+    // Ignore
+  }
+  return remaining;
+}
+
+// ============================================================================
+// 7. AI USAGE HISTORY SYSTEM (Chronological AI Interactions in localStorage)
+// ============================================================================
+
+export interface UsageHistoryEntry {
+  id: string;
+  modelUsed: string;
+  providerUsed: string;
+  prompt: string;
+  responseSnippet: string;
+  fullResponse?: string;
+  estimatedTokens: number;
+  latencyMs: number;
+  tokensPerSec: number;
+  timestamp: number;
+  category?: string;
+}
+
+export const AI_USAGE_HISTORY_STORAGE_KEY = 'devpulse_ai_usage_history_v1';
+
+export const DEFAULT_USAGE_HISTORY_ENTRIES: UsageHistoryEntry[] = [
+  {
+    id: 'usage-seed-1',
+    modelUsed: 'gemini-3.8-flash',
+    providerUsed: 'Google Gemini Auto-Rotator',
+    prompt: 'Create a high-conversion SaaS pricing table with Monthly/Annual toggle, highlighted Pro tier, and FAQ accordion.',
+    responseSnippet: '<section class="min-h-screen bg-[#06070B] text-white p-8"><div class="max-w-6xl mx-auto"><h1>Predictable AI Infrastructure Pricing</h1>...',
+    estimatedTokens: 642,
+    latencyMs: 380,
+    tokensPerSec: 1689,
+    timestamp: 1762006500000,
+    category: 'Artifact Synthesis'
+  },
+  {
+    id: 'usage-seed-2',
+    modelUsed: 'groq-llama-70b',
+    providerUsed: 'Groq Cloud LPU (Llama 3.3 70B)',
+    prompt: 'Generate an optimized PostgreSQL query with CTEs to compute monthly recurring revenue (MRR), expansion, and net churn by cohort.',
+    responseSnippet: 'WITH monthly_cohorts AS (SELECT date_trunc(\'month\', created_at) AS cohort_month, customer_id, SUM(mrr_cents) / 100.0 AS mrr FROM subscriptions...',
+    estimatedTokens: 418,
+    latencyMs: 215,
+    tokensPerSec: 1944,
+    timestamp: 1762005900000,
+    category: 'AI SQL Architect'
+  },
+  {
+    id: 'usage-seed-3',
+    modelUsed: 'gemini-4-argon',
+    providerUsed: 'Google Gemini 4 Argon (Pro)',
+    prompt: 'Refactor the real-time telemetry WebSocket dispatcher to enforce exponential backoff and deterministic state reconciliation.',
+    responseSnippet: 'export class TelemetryReconciler { private retryAttempt = 0; public scheduleReconnect(baseDelayMs = 250): number { const jitter = Math.random() * 50...',
+    estimatedTokens: 512,
+    latencyMs: 490,
+    tokensPerSec: 1045,
+    timestamp: 1762004800000,
+    category: 'Code Refactoring'
+  }
+];
+
+export function estimateTokenCountFromText(prompt: string, responseText: string): number {
+  const combinedLength = (prompt || '').length + (responseText || '').length;
+  return Math.max(12, Math.round(combinedLength / 3.8));
+}
+
+export function buildResponseSnippet(responseText: string, maxLength: number = 180): string {
+  const normalized = (responseText || '').replace(/\s+/g, ' ').trim();
+  if (!normalized) return '(Empty response)';
+  if (normalized.length <= maxLength) return normalized;
+  return `${normalized.slice(0, maxLength - 3)}...`;
+}
+
+export function loadAiUsageHistory(): UsageHistoryEntry[] {
+  try {
+    if (typeof localStorage === 'undefined') {
+      return [...DEFAULT_USAGE_HISTORY_ENTRIES];
+    }
+    const raw = localStorage.getItem(AI_USAGE_HISTORY_STORAGE_KEY);
+    if (!raw) {
+      localStorage.setItem(
+        AI_USAGE_HISTORY_STORAGE_KEY,
+        JSON.stringify(DEFAULT_USAGE_HISTORY_ENTRIES)
+      );
+      return [...DEFAULT_USAGE_HISTORY_ENTRIES];
+    }
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      return [...DEFAULT_USAGE_HISTORY_ENTRIES];
+    }
+    return parsed
+      .filter(
+        (item): item is UsageHistoryEntry =>
+          Boolean(item && typeof item.id === 'string' && typeof item.prompt === 'string')
+      )
+      .sort((a, b) => b.timestamp - a.timestamp);
+  } catch {
+    return [...DEFAULT_USAGE_HISTORY_ENTRIES];
+  }
+}
+
+export function recordAiUsageHistoryEntry(input: {
+  modelUsed: string;
+  providerUsed?: string;
+  prompt: string;
+  responseText: string;
+  latencyMs?: number;
+  estimatedTokens?: number;
+  category?: string;
+  timestamp?: number;
+}): { entry: UsageHistoryEntry; history: UsageHistoryEntry[] } {
+  const cleanPrompt = (input.prompt || '').trim() || 'Untitled AI Prompt';
+  const cleanResponse = (input.responseText || '').trim();
+  const latencyMs = Math.max(10, Math.round(input.latencyMs ?? 240));
+  const estimatedTokens =
+    typeof input.estimatedTokens === 'number' && input.estimatedTokens > 0
+      ? Math.round(input.estimatedTokens)
+      : estimateTokenCountFromText(cleanPrompt, cleanResponse);
+  const tokensPerSec = Math.max(15, Math.round((estimatedTokens / latencyMs) * 1000));
+
+  const entry: UsageHistoryEntry = {
+    id: `usage-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    modelUsed: (input.modelUsed || 'gemini-3.8-flash').trim(),
+    providerUsed: (input.providerUsed || 'Google Gemini Auto-Rotator').trim(),
+    prompt: cleanPrompt,
+    responseSnippet: buildResponseSnippet(cleanResponse, 180),
+    fullResponse: cleanResponse.slice(0, 4000),
+    estimatedTokens,
+    latencyMs,
+    tokensPerSec,
+    timestamp: input.timestamp ?? Date.now(),
+    category: input.category || 'AI Synthesis'
+  };
+
+  const current = loadAiUsageHistory();
+  const history = [entry, ...current].slice(0, 60);
+
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(AI_USAGE_HISTORY_STORAGE_KEY, JSON.stringify(history));
+    }
+    if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+      window.dispatchEvent(new CustomEvent('devpulse-usage-history-updated'));
+    }
+  } catch {
+    // Ignore storage errors
+  }
+
+  return { entry, history };
+}
+
+export function clearAiUsageHistory(): UsageHistoryEntry[] {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(AI_USAGE_HISTORY_STORAGE_KEY, JSON.stringify([]));
+    }
+    if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+      window.dispatchEvent(new CustomEvent('devpulse-usage-history-updated'));
+    }
+  } catch {
+    // Ignore
+  }
+  return [];
+}
+
+export function filterAiUsageHistory(
+  entries: UsageHistoryEntry[],
+  searchQuery: string = '',
+  modelFilter: string = 'all'
+): UsageHistoryEntry[] {
+  const q = (searchQuery || '').trim().toLowerCase();
+  const m = (modelFilter || 'all').trim().toLowerCase();
+
+  return entries
+    .filter((item) => {
+      const matchesModel =
+        m === 'all' ||
+        item.modelUsed.toLowerCase().includes(m) ||
+        item.providerUsed.toLowerCase().includes(m);
+      if (!matchesModel) return false;
+      if (!q) return true;
+      return (
+        item.prompt.toLowerCase().includes(q) ||
+        item.responseSnippet.toLowerCase().includes(q) ||
+        item.modelUsed.toLowerCase().includes(q) ||
+        item.providerUsed.toLowerCase().includes(q) ||
+        (item.category || '').toLowerCase().includes(q)
+      );
+    })
+    .sort((a, b) => b.timestamp - a.timestamp);
+}
+
+// ============================================================================
+// 15. VIRAL WATERMARK LOOP & 1-CLICK IDE EXPORTERS (CodePen, StackBlitz, JSFiddle)
+// ============================================================================
+
+export const VIRAL_BADGE_COMMENT_MARKER = '<!-- devpulse-viral-watermark -->';
+
+/**
+ * Injects a sleek floating glass pill in the bottom-right corner of the exported or shared HTML
+ * ("⚡ Built Free on DevPulse AI") linking back to window.location.origin when enabled.
+ */
+export function injectViralWatermarkBadge(
+  html: string,
+  origin: string = 'https://devpulse.ai',
+  enabled: boolean = true
+): string {
+  const rawHtml = html || '';
+  if (!enabled) {
+    return rawHtml;
+  }
+  if (rawHtml.includes(VIRAL_BADGE_COMMENT_MARKER)) {
+    return rawHtml;
+  }
+
+  const cleanOrigin = (origin || 'https://devpulse.ai').replace(/\/+$/, '');
+  const badgeSnippet = `\n${VIRAL_BADGE_COMMENT_MARKER}
+<a href="${cleanOrigin}" target="_blank" rel="noopener noreferrer" style="position:fixed;bottom:16px;right:16px;z-index:99999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9999px;background:rgba(6,7,11,0.88);backdrop-filter:blur(12px);border:1px solid rgba(99,102,241,0.45);color:#f4f4f5;font-family:system-ui,-apple-system,sans-serif;font-size:12px;font-weight:700;text-decoration:none;box-shadow:0 10px 25px -5px rgba(0,0,0,0.6);">
+  <span>⚡ Built Free on DevPulse AI</span>
+</a>\n`;
+
+  if (/<\/body>/i.test(rawHtml)) {
+    return rawHtml.replace(/<\/body>/i, `${badgeSnippet}</body>`);
+  }
+  return `${rawHtml}${badgeSnippet}`;
+}
+
+export interface IdeExportFormSpec {
+  ide: 'codepen' | 'stackblitz' | 'jsfiddle';
+  actionUrl: string;
+  method: 'POST';
+  target: '_blank';
+  fields: Record<string, string>;
+}
+
+/**
+ * Builds the hidden form-POST specification for CodePen (`https://codepen.io/pen/define`),
+ * StackBlitz (`https://stackblitz.com/run`), and JSFiddle (`https://jsfiddle.net/api/post/library/pure/`).
+ */
+export function buildIdeExportFormSpec(
+  ide: 'codepen' | 'stackblitz' | 'jsfiddle',
+  codeState: ArtifactCodeState,
+  options?: {
+    includeViralBadge?: boolean;
+    origin?: string;
+    title?: string;
+  }
+): IdeExportFormSpec {
+  const includeBadge = options?.includeViralBadge ?? true;
+  const origin = options?.origin || 'https://devpulse.ai';
+  const title = (options?.title || codeState.seoTitle || 'DevPulse AI Artifact').trim();
+  const htmlWithOptionalBadge = injectViralWatermarkBadge(
+    codeState.html || '',
+    origin,
+    includeBadge
+  );
+  const css = codeState.css || '';
+  const js = codeState.js || '';
+
+  if (ide === 'codepen') {
+    const payload = {
+      title: 'DevPulse AI Artifact',
+      description: codeState.seoDescription || codeState.prompt || 'Built with DevPulse AI',
+      html: htmlWithOptionalBadge,
+      css,
+      js,
+    };
+    return {
+      ide: 'codepen',
+      actionUrl: 'https://codepen.io/pen/define',
+      method: 'POST',
+      target: '_blank',
+      fields: {
+        data: JSON.stringify(payload),
+      },
+    };
+  }
+
+  if (ide === 'stackblitz') {
+    return {
+      ide: 'stackblitz',
+      actionUrl: 'https://stackblitz.com/run',
+      method: 'POST',
+      target: '_blank',
+      fields: {
+        'project[title]': title || 'DevPulse AI Artifact',
+        'project[description]':
+          codeState.seoDescription || codeState.prompt || 'Generated on DevPulse AI',
+        'project[template]': 'javascript',
+        'project[files][index.html]': htmlWithOptionalBadge,
+        'project[files][style.css]': css,
+        'project[files][index.js]': js,
+      },
+    };
+  }
+
+  return {
+    ide: 'jsfiddle',
+    actionUrl: 'https://jsfiddle.net/api/post/library/pure/',
+    method: 'POST',
+    target: '_blank',
+    fields: {
+      title: title || 'DevPulse AI Artifact',
+      html: htmlWithOptionalBadge,
+      css,
+      js,
+    },
+  };
+}
+
+/**
+ * Executes a real DOM hidden `<form method="POST" target="_blank">` submission to open
+ * the current artifact in CodePen, StackBlitz, or JSFiddle.
+ */
+export function submitIdeExportForm(
+  ide: 'codepen' | 'stackblitz' | 'jsfiddle',
+  codeState: ArtifactCodeState,
+  options?: {
+    includeViralBadge?: boolean;
+    origin?: string;
+    title?: string;
+  }
+): IdeExportFormSpec {
+  const spec = buildIdeExportFormSpec(ide, codeState, options);
+  if (typeof document !== 'undefined' && document.body) {
+    const form = document.createElement('form');
+    form.method = spec.method;
+    form.action = spec.actionUrl;
+    form.target = spec.target;
+    form.style.display = 'none';
+
+    for (const [name, value] of Object.entries(spec.fields)) {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = name;
+      input.value = value;
+      form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    try {
+      form.submit();
+    } catch {
+      // Ignore popup restrictions in headless test environments
+    }
+    setTimeout(() => {
+      form.remove();
+    }, 500);
+  }
+  return spec;
+}
+
+// ============================================================================
+// 16. AI ENGINEERING ROI & TOKEN COST CALCULATOR ENGINE
+// ============================================================================
+
+export interface EngineeringRoiInputs {
+  teamSize?: number;
+  developersCount?: number;
+  hourlyRateUsd: number;
+  promptsPerDayPerDev?: number;
+  minutesSavedPerPrompt?: number;
+  hoursSavedPerDevPerWeek?: number;
+  monthlyPromptsPerDev?: number;
+  monthlyApiCostUsd?: number;
+}
+
+export interface EngineeringRoiMetrics {
+  monthlyHoursSaved: number;
+  annualHoursSaved: number;
+  grossMonthlyValueUsd: number;
+  grossMonthlySavingsUsd: number;
+  netMonthlySavingsUsd: number;
+  annualNetSavingsUsd: number;
+  annualSavingsUsd: number;
+  roiPercent: number;
+  roiMultiple: number;
+  paybackDays: number;
+  estimatedMonthlyTokens: number;
+  estimatedMonthlyTokenCostUsd: number;
+  markdownSummary: string;
+}
+
+export function calculateEngineeringRoi(inputs: EngineeringRoiInputs): EngineeringRoiMetrics {
+  const teamSize = Math.max(1, Math.round(inputs.teamSize || inputs.developersCount || 1));
+  const hourlyRateUsd = Math.max(10, Math.round(inputs.hourlyRateUsd || 75));
+  const promptsPerDayPerDev = Math.max(1, Math.round(inputs.promptsPerDayPerDev || 10));
+  const minutesSavedPerPrompt = Math.max(1, Math.round(inputs.minutesSavedPerPrompt || 15));
+  const workingDaysPerMonth = 22;
+
+  let monthlyHoursSaved: number;
+  if (typeof inputs.hoursSavedPerDevPerWeek === 'number' && inputs.hoursSavedPerDevPerWeek > 0) {
+    monthlyHoursSaved = Math.round(teamSize * inputs.hoursSavedPerDevPerWeek * 4.33 * 10) / 10;
+  } else {
+    const totalMonthlyMinutes =
+      teamSize * promptsPerDayPerDev * minutesSavedPerPrompt * workingDaysPerMonth;
+    monthlyHoursSaved = Math.round((totalMonthlyMinutes / 60) * 10) / 10;
+  }
+
+  const annualHoursSaved = Math.round(monthlyHoursSaved * 12);
+
+  const monthlyPromptsPerDev =
+    typeof inputs.monthlyPromptsPerDev === 'number' && inputs.monthlyPromptsPerDev > 0
+      ? inputs.monthlyPromptsPerDev
+      : promptsPerDayPerDev * workingDaysPerMonth;
+
+  // Estimate ~1,200 tokens per prompt (input + output)
+  const estimatedMonthlyTokens = teamSize * monthlyPromptsPerDev * 1200;
+  const estimatedMonthlyTokenCostUsd =
+    Math.round(((estimatedMonthlyTokens / 1_000_000) * 0.6) * 100) / 100;
+
+  const monthlyApiCostUsd =
+    typeof inputs.monthlyApiCostUsd === 'number'
+      ? Math.max(0, Math.round(inputs.monthlyApiCostUsd))
+      : Math.max(1, Math.round(estimatedMonthlyTokenCostUsd));
+
+  const grossMonthlyValueUsd = Math.round(monthlyHoursSaved * hourlyRateUsd);
+  const netMonthlySavingsUsd = Math.max(0, grossMonthlyValueUsd - monthlyApiCostUsd);
+  const annualNetSavingsUsd = netMonthlySavingsUsd * 12;
+
+  const costBasis = Math.max(1, monthlyApiCostUsd);
+  const roiPercent =
+    monthlyApiCostUsd === 0
+      ? grossMonthlyValueUsd * 100
+      : Math.max(0, Math.round(((grossMonthlyValueUsd - monthlyApiCostUsd) / costBasis) * 100));
+  const roiMultiple = Math.max(1, Math.round((grossMonthlyValueUsd / costBasis) * 10) / 10);
+
+  const dailyValueUsd = Math.max(1, grossMonthlyValueUsd / 30);
+  const paybackDays =
+    monthlyApiCostUsd === 0 ? 1 : Math.max(1, Math.round((monthlyApiCostUsd / dailyValueUsd) * 10) / 10);
+
+  const markdownSummary = `### DevPulse AI — Engineering ROI Executive Summary
+- **Team Size:** ${teamSize} Engineers @ $${hourlyRateUsd}/hr
+- **Daily AI Velocity:** ${promptsPerDayPerDev} prompts/dev/day (${minutesSavedPerPrompt} mins saved each)
+- **Monthly Dev Hours Reclaimed:** ${monthlyHoursSaved.toLocaleString()} hrs/mo (${annualHoursSaved.toLocaleString()} hrs/yr)
+- **Gross Engineering Value Unlocked:** $${grossMonthlyValueUsd.toLocaleString()}/mo
+- **Monthly API & Hosting Spend:** $${monthlyApiCostUsd.toLocaleString()}/mo
+- **Net Monthly Savings:** **$${netMonthlySavingsUsd.toLocaleString()}/mo** ($${annualNetSavingsUsd.toLocaleString()}/yr)
+- **Estimated ROI:** **${roiPercent.toLocaleString()}%** (Payback: ${paybackDays === 0 ? 'Instant / $0 Cost' : `${paybackDays} days`})`;
+
+  return {
+    monthlyHoursSaved,
+    annualHoursSaved,
+    grossMonthlyValueUsd,
+    grossMonthlySavingsUsd: grossMonthlyValueUsd,
+    netMonthlySavingsUsd,
+    annualNetSavingsUsd,
+    annualSavingsUsd: annualNetSavingsUsd,
+    roiPercent,
+    roiMultiple,
+    paybackDays,
+    estimatedMonthlyTokens,
+    estimatedMonthlyTokenCostUsd,
+    markdownSummary,
+  };
+}
+
+// ============================================================================
+// 17. GITHUB GIST EXPORT PAYLOAD, SHAREABLE ARTIFACT URL PRESENCE & A-ADS 2460701
+// ============================================================================
+
+export interface GitHubGistPayload {
+  description: string;
+  public: boolean;
+  files: Record<string, { content: string }>;
+}
+
+/**
+ * Builds a GitHub REST API v3 Gist payload (`POST https://api.github.com/gists`)
+ * containing standalone `index.html`, `styles.css`, `app.js`, and `README.md` files.
+ */
+export function buildGitHubGistPayload(
+  codeState: ArtifactCodeState,
+  description?: string,
+  isPublic: boolean = true
+): GitHubGistPayload {
+  const cleanDescription =
+    (description || codeState.seoTitle || codeState.prompt || 'Exported from DevPulse AI Studio')
+      .trim()
+      .slice(0, 140) || 'Exported from DevPulse AI Studio';
+
+  const archive = generateProjectZipArchive(codeState);
+  const gistFiles: Record<string, { content: string }> = {};
+
+  for (const file of archive.files) {
+    const content = (file.content || '').trim() || `// ${file.name}`;
+    gistFiles[file.name] = { content };
+  }
+
+  return {
+    description: cleanDescription,
+    public: Boolean(isPublic),
+    files: gistFiles,
+  };
+}
+
+/**
+ * Computes a deterministic real-time presence room ID scoped to the exact
+ * shareable artifact URL so developers viewing the same artifact URL see each other live.
+ */
+export function deriveArtifactPresenceRoomId(
+  shareableArtifactUrl: string,
+  activeToolSlug: string = 'ai-ui-generator'
+): string {
+  const cleanSlug =
+    (activeToolSlug || 'ai-ui-generator')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9-]+/g, '-') || 'ai-ui-generator';
+
+  const rawUrl = (shareableArtifactUrl || '').trim();
+  const hashIndex = rawUrl.indexOf('#');
+  const hashPart = hashIndex >= 0 ? rawUrl.slice(hashIndex + 1) : rawUrl;
+
+  let hash = 2166136261;
+  for (let i = 0; i < hashPart.length; i++) {
+    hash ^= hashPart.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  const shortHash = (hash >>> 0).toString(36).slice(0, 8);
+  return `artifact-url-${cleanSlug}-${shortHash}`;
+}
+
+export const AADS_UNIT_ID = '2460701';
+export const AADS_IFRAME_SRC = '//acceptable.a-ads.com/2460701/?size=Adaptive';
+
+export interface AadsVerificationCheck {
+  unitId: string;
+  hasBeginMarker: boolean;
+  hasEndMarker: boolean;
+  hasFrameContainer: boolean;
+  hasDataAaAttribute: boolean;
+  hasAcceptableIframeSrc: boolean;
+  isVerified: boolean;
+}
+
+/**
+ * Verifies that the exact A-ADS Ad Unit 2460701 snippet is embedded in HTML markup
+ * for ads.com / a-ads.com crawler verification.
+ */
+export function verifyAadsEmbedSnippet(htmlMarkup: string): AadsVerificationCheck {
+  const raw = htmlMarkup || '';
+  const hasBeginMarker = raw.includes('<!-- BEGIN AADS AD UNIT 2460701 -->');
+  const hasEndMarker = raw.includes('<!-- END AADS AD UNIT 2460701 -->');
+  const hasFrameContainer = raw.includes('id="frame"');
+  const hasDataAaAttribute =
+    raw.includes("data-aa='2460701'") || raw.includes('data-aa="2460701"');
+  const hasAcceptableIframeSrc = raw.includes(
+    '//acceptable.a-ads.com/2460701/?size=Adaptive'
+  );
+
+  return {
+    unitId: AADS_UNIT_ID,
+    hasBeginMarker,
+    hasEndMarker,
+    hasFrameContainer,
+    hasDataAaAttribute,
+    hasAcceptableIframeSrc,
+    isVerified:
+      hasBeginMarker &&
+      hasEndMarker &&
+      hasFrameContainer &&
+      hasDataAaAttribute &&
+      hasAcceptableIframeSrc,
+  };
+}

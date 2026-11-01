@@ -15,3 +15,5 @@
 - [AI GitHub README Generator](https://yourdomain.com/?tool=readme-generator): Generate structured README.md documentation with badges, quickstart, and API reference tables.
 - [Cron Expression Generator](https://yourdomain.com/?tool=cron-expression): Convert human schedules into 5-field cron syntax with plain-English explanations and next run calculators.
 - [SVG Optimizer & JSX Converter](https://yourdomain.com/?tool=svg-optimizer): Minify raw SVG vectors, convert to React/TypeScript JSX components, or generate custom SVG icons.
+- [AI Engineering ROI & Token Cost Calculator](https://yourdomain.com/?tool=roi-calculator): Calculate developer hours saved, monthly payroll ROI, and LLM API token cost comparison.
+- [Free Tailwind CSS & React Component Templates](https://yourdomain.com/?tool=free-templates): Browse and launch 12+ production-ready Tailwind CSS & React UI templates in the live sandbox.

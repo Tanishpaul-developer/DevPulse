@@ -40,8 +40,45 @@ import {
   computeCodeHealthMetrics,
   buildShareableArtifactUrl,
   generateUrlQrCodeSvg,
-  generateProjectZipArchive
+  generateProjectZipArchive,
+  DEFAULT_SAVED_SNIPPETS,
+  generateAllSavedSnippetsZipArchive,
+  buildGitHubPushPayload,
+  buildVercelDeploymentPayload,
+  runArtifactJestSuite,
+  createLocalCollaboratorProfile,
+  applyCollaboratorCursorEvent,
+  FEEDBACK_CATEGORIES,
+  loadUserFeedbackEntries,
+  submitUserFeedbackEntry,
+  deleteUserFeedbackEntry,
+  DEFAULT_USAGE_HISTORY_ENTRIES,
+  loadAiUsageHistory,
+  recordAiUsageHistoryEntry,
+  clearAiUsageHistory,
+  filterAiUsageHistory,
+  estimateTokenCountFromText,
+  buildResponseSnippet,
+  injectViralWatermarkBadge,
+  buildIdeExportFormSpec,
+  calculateEngineeringRoi,
+  buildGitHubGistPayload,
+  deriveArtifactPresenceRoomId,
+  verifyAadsEmbedSnippet
 } from './studioEngine';
+import { formatArtifactWithPrettierStandalone } from './prettierWorkerClient';
+import fs from 'node:fs';
+import path from 'node:path';
+import {
+  CHAI4ME_UPI_URL,
+  NOWPAYMENTS_PUBLIC_KEY,
+  NOWPAYMENTS_DONATE_URL,
+  NOWPAYMENTS_WIDGET_URL,
+  AFFILIATE_LINKS,
+  getContextualAffiliateForTool
+} from '../config/monetization';
+import fs from 'node:fs';
+import path from 'node:path';
 import {
   parseCurlAndConvert,
   decodeJwtToken,
@@ -160,7 +197,7 @@ describe('DevPulse AI v3.5 Core Logic & SEO Suite Unit Tests', () => {
     assert.ok(updated.includes('bg-emerald-600 text-white font-bold'));
   });
 
-  it('verifies all 12 Programmatic SEO Tools (?tool=slug) exist with rich metadata', () => {
+  it('verifies all 14 Programmatic SEO Tools (/tools/:slug) exist with rich metadata', () => {
     const expectedSlugs = [
       'ai-ui-generator',
       'screenshot-to-code',
@@ -173,9 +210,11 @@ describe('DevPulse AI v3.5 Core Logic & SEO Suite Unit Tests', () => {
       'error-explainer',
       'readme-generator',
       'cron-expression',
-      'svg-optimizer'
-    ];
-    assert.equal(SEO_TOOLS_CATALOG.length, 12);
+      'svg-optimizer',
+      'roi-calculator',
+      'free-templates'
+    ] as const;
+    assert.equal(SEO_TOOLS_CATALOG.length, 14);
     for (const slug of expectedSlugs) {
       const tool = getSeoToolBySlug(slug);
       assert.equal(tool.slug, slug);
@@ -290,13 +329,13 @@ describe('DevPulse AI v3.5 Core Logic & SEO Suite Unit Tests', () => {
     assert.ok(lightDoc.includes('class="light"'));
   });
 
-  it('provides a 2-second quickTip snippet on all 12 tools and filters tools in real time by name or description', () => {
+  it('provides a 2-second quickTip snippet on all 14 tools and filters tools in real time by name or description', () => {
     for (const tool of SEO_TOOLS_CATALOG) {
       assert.ok(tool.quickTip && tool.quickTip.length >= 20, `Missing quickTip on ${tool.slug}`);
     }
 
-    // Empty query returns all 12 tools
-    assert.equal(filterSeoToolsCatalog('', 'All').length, 12);
+    // Empty query returns all 14 tools
+    assert.equal(filterSeoToolsCatalog('', 'All').length, 14);
 
     // Search by tool name ("JWT")
     const jwtMatches = filterSeoToolsCatalog('JWT', 'All');
@@ -681,5 +720,409 @@ describe('DevPulse AI v3.5 Core Logic & SEO Suite Unit Tests', () => {
       assert.ok(types.includes('HowTo'), `Missing HowTo schema for ${tool.slug}`);
       assert.ok(types.includes('FAQPage'), `Missing FAQPage schema for ${tool.slug}`);
     }
+  });
+
+  it('builds a valid Vercel v13 API deployment payload with index.html, styles.css, app.js, and vercel.json', () => {
+    const payload = buildVercelDeploymentPayload({
+      html: '<main class="p-6"><h1>Vercel Standalone Edge App</h1></main>',
+      css: 'body { background: #06070B; }',
+      js: 'console.log("Deployed to Vercel");',
+      prompt: 'Vercel Edge App',
+      seoTitle: 'Vercel Edge App'
+    });
+
+    assert.equal(payload.name, 'devpulse-vercel-edge-app');
+    assert.equal(payload.target, 'production');
+    assert.deepEqual(
+      payload.files.map((f) => f.file),
+      ['index.html', 'styles.css', 'app.js', 'vercel.json']
+    );
+    assert.ok(payload.files[0].data.includes('<title>Vercel Edge App</title>'));
+    assert.ok(payload.files[0].data.includes('<link rel="stylesheet" href="/styles.css" />'));
+    assert.ok(payload.files[0].data.includes('<script src="/app.js" defer></script>'));
+    assert.ok(payload.files[3].data.includes('"cleanUrls": true'));
+  });
+
+  it('runs the Jest-like test suite against generated code and reports passed/failed specs for the Console Panel', () => {
+    const passingSuite = runArtifactJestSuite(DEFAULT_STARTER_ARTIFACT);
+    assert.equal(passingSuite.allPassed, true);
+    assert.equal(passingSuite.passedCount, 6);
+    assert.equal(passingSuite.failedCount, 0);
+    assert.equal(passingSuite.totalCount, 6);
+    assert.ok(passingSuite.consoleFormattedLines[0].message.startsWith('PASS '));
+
+    const failingSuite = runArtifactJestSuite({
+      html: '<div><img src="logo.png"><span>Unclosed div',
+      css: 'body { color: red; ',
+      js: 'function broken( {',
+      prompt: 'Broken test'
+    });
+    assert.equal(failingSuite.allPassed, false);
+    assert.ok(failingSuite.failedCount >= 3);
+    assert.ok(failingSuite.consoleFormattedLines[0].message.startsWith('FAIL '));
+    assert.ok(
+      failingSuite.results.some((r) => r.id === 'spec-js-syntax' && r.status === 'failed'),
+      'Expected JS syntax spec to fail on broken JS'
+    );
+  });
+
+  it('manages real-time multi-user cursor tracking state idempotently across room:init, user:joined, cursor:moved, and user:left', () => {
+    const self = createLocalCollaboratorProfile('peer-self-101');
+    const peerA = createLocalCollaboratorProfile('peer-remote-202');
+    const peerB = createLocalCollaboratorProfile('peer-remote-303');
+
+    // 1. room:init ignores selfClientId and deduplicates peers
+    let state = applyCollaboratorCursorEvent(
+      [],
+      {
+        type: 'room:init',
+        roomId: 'artifact-room-ai-ui-generator',
+        peers: [self, peerA, peerA],
+        timestamp: 1000
+      },
+      self.clientId
+    );
+    assert.equal(state.length, 1);
+    assert.equal(state[0].clientId, peerA.clientId);
+
+    // 2. user:joined adds peerB idempotently
+    state = applyCollaboratorCursorEvent(
+      state,
+      {
+        type: 'user:joined',
+        roomId: 'artifact-room-ai-ui-generator',
+        peer: peerB,
+        timestamp: 2000
+      },
+      self.clientId
+    );
+    assert.equal(state.length, 2);
+
+    // 3. cursor:moved updates peerA coordinates and clamps to [2, 98]
+    state = applyCollaboratorCursorEvent(
+      state,
+      {
+        type: 'cursor:moved',
+        roomId: 'artifact-room-ai-ui-generator',
+        peer: { ...peerA, xPercent: 74, yPercent: 31 },
+        timestamp: 3000
+      },
+      self.clientId
+    );
+    const updatedA = state.find((p) => p.clientId === peerA.clientId);
+    assert.equal(updatedA?.xPercent, 74);
+    assert.equal(updatedA?.yPercent, 31);
+
+    // 4. user:left removes peerA cleanly
+    state = applyCollaboratorCursorEvent(
+      state,
+      {
+        type: 'user:left',
+        roomId: 'artifact-room-ai-ui-generator',
+        clientId: peerA.clientId,
+        timestamp: 4000
+      },
+      self.clientId
+    );
+    assert.equal(state.length, 1);
+    assert.equal(state[0].clientId, peerB.clientId);
+  });
+
+  it('packages all saved snippets into a single PKZIP archive containing separate HTML, CSS, and JS files per snippet', () => {
+    const zipBundle = generateAllSavedSnippetsZipArchive(DEFAULT_SAVED_SNIPPETS);
+    assert.equal(zipBundle.filename, `devpulse-saved-snippets-${DEFAULT_SAVED_SNIPPETS.length}-bundle.zip`);
+    assert.ok(zipBundle.zipBytes.length > 200);
+    // Verify PKZIP signature (0x50, 0x4b, 0x03, 0x04)
+    assert.equal(zipBundle.zipBytes[0], 0x50);
+    assert.equal(zipBundle.zipBytes[1], 0x4b);
+    assert.equal(zipBundle.zipBytes[2], 0x03);
+    assert.equal(zipBundle.zipBytes[3], 0x04);
+
+    // Each saved snippet produces index.html, styles.css, and app.js inside its own folder + root README.md
+    const fileNames = zipBundle.files.map((f) => f.name);
+    assert.ok(fileNames.includes('README.md'));
+    assert.ok(fileNames.some((f) => f.endsWith('/index.html')));
+    assert.ok(fileNames.some((f) => f.endsWith('/styles.css')));
+    assert.ok(fileNames.some((f) => f.endsWith('/app.js')));
+    assert.equal(fileNames.length, DEFAULT_SAVED_SNIPPETS.length * 3 + 1);
+  });
+
+  it('builds a GitHub OAuth push payload with index.html, styles.css, app.js, and README.md', () => {
+    const payload = buildGitHubPushPayload(
+      {
+        html: '<section class="p-6"><h1>GitHub OAuth Artifact</h1></section>',
+        css: '.hero { color: #34d399; }',
+        js: 'console.log("Pushed to GitHub");',
+        prompt: 'GitHub OAuth Artifact',
+        seoTitle: 'GitHub OAuth Artifact'
+      },
+      'My Awesome UI Repo!',
+      'main',
+      'feat: push artifact via GitHub OAuth'
+    );
+
+    assert.equal(payload.repoName, 'my-awesome-ui-repo');
+    assert.equal(payload.branch, 'main');
+    assert.equal(payload.commitMessage, 'feat: push artifact via GitHub OAuth');
+    assert.deepEqual(
+      payload.files.map((f) => f.path),
+      ['index.html', 'styles.css', 'app.js', 'README.md']
+    );
+  });
+
+  it('includes the Bing Webmaster Verification meta tag (msvalidate.01) in index.html head before body', () => {
+    const indexHtmlPath = path.resolve(process.cwd(), 'index.html');
+    const htmlContent = fs.readFileSync(indexHtmlPath, 'utf-8');
+    const metaTag = '<meta name="msvalidate.01" content="BA4093347487319FB65952C5992D26DB" />';
+    const metaIndex = htmlContent.indexOf(metaTag);
+    const headEndIndex = htmlContent.indexOf('</head>');
+    const bodyStartIndex = htmlContent.indexOf('<body');
+
+    assert.ok(metaIndex !== -1, 'Expected index.html to contain msvalidate.01 meta tag');
+    assert.ok(metaIndex < headEndIndex, 'Expected msvalidate.01 meta tag inside <head>');
+    assert.ok(metaIndex < bodyStartIndex, 'Expected msvalidate.01 meta tag before first <body>');
+  });
+
+  it('stores, loads, and deletes user feedback entries across bug_report, feature_request, and general_feedback categories in localStorage', () => {
+    const store = new Map<string, string>();
+    (globalThis as unknown as { localStorage: Storage }).localStorage = {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        store.set(k, v);
+      },
+      removeItem: (k: string) => {
+        store.delete(k);
+      },
+      clear: () => {
+        store.clear();
+      },
+      key: (i: number) => Array.from(store.keys())[i] ?? null,
+      get length() {
+        return store.size;
+      }
+    };
+
+    assert.deepEqual(
+      FEEDBACK_CATEGORIES.map((c) => c.id),
+      ['bug_report', 'feature_request', 'general_feedback']
+    );
+
+    const first = submitUserFeedbackEntry({
+      category: 'bug_report',
+      message: 'Preview iframe scroll position resets on mobile resize',
+      email: 'qa@example.com',
+      activeTool: 'ai-ui-generator'
+    });
+    assert.equal(first.entry.category, 'bug_report');
+    assert.equal(first.entries.length, 1);
+
+    const second = submitUserFeedbackEntry({
+      category: 'feature_request',
+      message: 'Add Svelte 5 runes component exporter to the framework bar',
+      activeTool: 'ai-ui-generator'
+    });
+    assert.equal(second.entry.category, 'feature_request');
+    assert.equal(second.entries.length, 2);
+
+    const loaded = loadUserFeedbackEntries();
+    assert.equal(loaded.length, 2);
+
+    const remaining = deleteUserFeedbackEntry(first.entry.id);
+    assert.equal(remaining.length, 1);
+    assert.equal(remaining[0].id, second.entry.id);
+  });
+
+  it('records, loads, filters, and clears chronological AI Usage History entries in localStorage with model, prompt, response snippet, and token/time telemetry', () => {
+    const store = new Map<string, string>();
+    (globalThis as unknown as { localStorage: Storage }).localStorage = {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        store.set(k, v);
+      },
+      removeItem: (k: string) => {
+        store.delete(k);
+      },
+      clear: () => {
+        store.clear();
+      },
+      key: (i: number) => Array.from(store.keys())[i] ?? null,
+      get length() {
+        return store.size;
+      }
+    };
+
+    const initial = loadAiUsageHistory();
+    assert.equal(initial.length, DEFAULT_USAGE_HISTORY_ENTRIES.length);
+
+    const tokens = estimateTokenCountFromText('Build a navbar', '<nav class="flex">Logo</nav>');
+    assert.ok(tokens >= 12);
+
+    const snippet = buildResponseSnippet('   <div>   Hello   World   </div>   ', 50);
+    assert.equal(snippet, '<div> Hello World </div>');
+
+    const recorded = recordAiUsageHistoryEntry({
+      modelUsed: 'groq-llama-70b',
+      providerUsed: 'Groq Cloud LPU',
+      prompt: 'Generate a Redis Lua token bucket script',
+      responseText: 'local tokens = tonumber(redis.call("get", KEYS[1])) return tokens',
+      latencyMs: 145,
+      timestamp: Date.now() + 5000,
+      category: 'Backend Script'
+    });
+
+    assert.equal(recorded.entry.modelUsed, 'groq-llama-70b');
+    assert.equal(recorded.entry.latencyMs, 145);
+    assert.ok(recorded.entry.estimatedTokens >= 12);
+    assert.equal(recorded.history[0].id, recorded.entry.id);
+
+    const groqFiltered = filterAiUsageHistory(recorded.history, 'Redis Lua', 'groq-llama-70b');
+    assert.equal(groqFiltered.length, 1);
+    assert.equal(groqFiltered[0].id, recorded.entry.id);
+
+    const cleared = clearAiUsageHistory();
+    assert.equal(cleared.length, 0);
+  });
+
+  it('injects and deduplicates the Viral Built Free on DevPulse AI watermark badge in exported HTML and Share URL state', () => {
+    const rawHtml = '<!DOCTYPE html><html><body><h1>Landing Page</h1></body></html>';
+    const withBadge = injectViralWatermarkBadge(rawHtml, 'https://devpulse.ai', true);
+    assert.ok(withBadge.includes('<!-- devpulse-viral-watermark -->'));
+    assert.ok(withBadge.includes('⚡ Built Free on DevPulse AI'));
+    assert.ok(withBadge.includes('href="https://devpulse.ai"'));
+
+    // Calling injectViralWatermarkBadge again does not duplicate the badge
+    const idempotent = injectViralWatermarkBadge(withBadge, 'https://devpulse.ai', true);
+    assert.equal(idempotent.split('<!-- devpulse-viral-watermark -->').length - 1, 1);
+
+    // When enabled is false, original HTML is returned untouched
+    const withoutBadge = injectViralWatermarkBadge(rawHtml, 'https://devpulse.ai', false);
+    assert.equal(withoutBadge, rawHtml);
+  });
+
+  it('builds 1-click IDE export form specifications for CodePen, StackBlitz, and JSFiddle', () => {
+    const sampleState = {
+      html: '<div class="card">Hello IDE</div>',
+      css: '.card { color: #6366f1; }',
+      js: 'console.log("IDE export");',
+      prompt: 'IDE Export Widget'
+    };
+
+    const codepenSpec = buildIdeExportFormSpec('codepen', sampleState, { includeViralBadge: true });
+    assert.equal(codepenSpec.actionUrl, 'https://codepen.io/pen/define');
+    assert.equal(codepenSpec.method, 'POST');
+    assert.equal(codepenSpec.target, '_blank');
+    assert.ok(codepenSpec.fields.data);
+    const parsedCodepen = JSON.parse(codepenSpec.fields.data);
+    assert.equal(parsedCodepen.title, 'DevPulse AI Artifact');
+    assert.ok(parsedCodepen.html.includes('⚡ Built Free on DevPulse AI'));
+    assert.equal(parsedCodepen.css, '.card { color: #6366f1; }');
+    assert.equal(parsedCodepen.js, 'console.log("IDE export");');
+
+    const stackblitzSpec = buildIdeExportFormSpec('stackblitz', sampleState, { includeViralBadge: false });
+    assert.equal(stackblitzSpec.actionUrl, 'https://stackblitz.com/run');
+    assert.ok(stackblitzSpec.fields['project[files][index.html]'].includes('<div class="card">Hello IDE</div>'));
+    assert.equal(stackblitzSpec.fields['project[files][style.css]'], '.card { color: #6366f1; }');
+    assert.equal(stackblitzSpec.fields['project[files][index.js]'], 'console.log("IDE export");');
+
+    const jsfiddleSpec = buildIdeExportFormSpec('jsfiddle', sampleState, { includeViralBadge: false });
+    assert.equal(jsfiddleSpec.actionUrl, 'https://jsfiddle.net/api/post/library/pure/');
+    assert.equal(jsfiddleSpec.fields.html, '<div class="card">Hello IDE</div>');
+    assert.equal(jsfiddleSpec.fields.css, '.card { color: #6366f1; }');
+    assert.equal(jsfiddleSpec.fields.js, 'console.log("IDE export");');
+  });
+
+  it('centralizes Hybrid Monetization credentials (Chai4Me UPI, NOWPayments, and Contextual Affiliate routing)', () => {
+    assert.equal(CHAI4ME_UPI_URL, 'https://chai4.me/YOUR_USERNAME');
+    assert.equal(NOWPAYMENTS_PUBLIC_KEY, '821c59c8-dc1e-446c-ac4d-f3035b462fc8');
+    assert.equal(
+      NOWPAYMENTS_DONATE_URL,
+      'https://nowpayments.io/donation?api_key=821c59c8-dc1e-446c-ac4d-f3035b462fc8'
+    );
+    assert.equal(
+      NOWPAYMENTS_WIDGET_URL,
+      'https://nowpayments.io/embeds/donation-widget?api_key=821c59c8-dc1e-446c-ac4d-f3035b462fc8'
+    );
+    assert.equal(AFFILIATE_LINKS.hosting, 'https://hostinger.in?REFERRALCODE=YOUR_CODE');
+    assert.equal(AFFILIATE_LINKS.database, 'https://m.do.co/c/YOUR_CODE');
+    assert.equal(AFFILIATE_LINKS.apiSecurity, 'https://get.brightdata.com/YOUR_CODE');
+
+    // Contextual affiliate routing by tool slug
+    assert.equal(getContextualAffiliateForTool('ai-ui-generator').url, AFFILIATE_LINKS.hosting);
+    assert.equal(getContextualAffiliateForTool('roi-calculator').url, AFFILIATE_LINKS.hosting);
+    assert.equal(getContextualAffiliateForTool('ai-sql-generator').url, AFFILIATE_LINKS.database);
+    assert.equal(getContextualAffiliateForTool('json-to-typescript').url, AFFILIATE_LINKS.database);
+    assert.equal(getContextualAffiliateForTool('free-templates').url, AFFILIATE_LINKS.database);
+    assert.equal(getContextualAffiliateForTool('curl-to-code').url, AFFILIATE_LINKS.apiSecurity);
+    assert.equal(getContextualAffiliateForTool('jwt-decoder').url, AFFILIATE_LINKS.apiSecurity);
+  });
+
+  it('calculates AI Engineering ROI and net monthly/annual savings accurately', () => {
+    const roi = calculateEngineeringRoi({
+      developersCount: 10,
+      hourlyRateUsd: 80,
+      hoursSavedPerDevPerWeek: 5,
+      monthlyPromptsPerDev: 400
+    });
+    assert.ok(roi.monthlyHoursSaved > 200);
+    assert.ok(roi.grossMonthlySavingsUsd > 16000);
+    assert.ok(roi.netMonthlySavingsUsd > 16000);
+    assert.equal(roi.annualSavingsUsd, roi.netMonthlySavingsUsd * 12);
+    assert.ok(roi.roiMultiple > 10);
+  });
+
+  it('builds GitHub Gist export payloads alongside Repository push payloads for HTML, CSS, JS, and README', () => {
+    const sampleState = {
+      html: '<main class="p-6"><h1>GitHub Export</h1></main>',
+      css: '.p-6 { padding: 1.5rem; }',
+      js: 'console.log("Exported to Gist");',
+      prompt: 'GitHub Export Test'
+    };
+
+    const gistPayload = buildGitHubGistPayload(sampleState, 'Interactive Gist Artifact', true);
+    assert.equal(gistPayload.description, 'Interactive Gist Artifact');
+    assert.equal(gistPayload.public, true);
+    assert.ok(gistPayload.files['index.html']?.content.includes('<h1>GitHub Export</h1>'));
+    assert.ok(gistPayload.files['styles.css']?.content.includes('.p-6'));
+    assert.ok(gistPayload.files['app.js']?.content.includes('Exported to Gist'));
+    assert.ok(gistPayload.files['README.md']?.content.includes('GitHub Export Test'));
+  });
+
+  it('derives deterministic real-time presence room IDs from shareable artifact URLs', () => {
+    const urlA = 'https://devpulse.ai/tools/ai-ui-generator#code=eyJodG1sIjoiPGgxPkE8L2gxPiJ9';
+    const urlB = 'https://devpulse.ai/tools/ai-ui-generator#code=eyJodG1sIjoiPGgxPkI8L2gxPiJ9';
+
+    const roomA1 = deriveArtifactPresenceRoomId(urlA, 'ai-ui-generator');
+    const roomA2 = deriveArtifactPresenceRoomId(urlA, 'ai-ui-generator');
+    const roomB = deriveArtifactPresenceRoomId(urlB, 'ai-ui-generator');
+
+    assert.equal(roomA1, roomA2);
+    assert.notEqual(roomA1, roomB);
+    assert.ok(roomA1.startsWith('artifact-url-ai-ui-generator-'));
+  });
+
+  it('formats HTML, CSS, and JS cleanly using Prettier standalone / worker engine', async () => {
+    const unformatted = {
+      html: '<div><section><h1>Hello Prettier</h1><p>Paragraph</p></section></div>',
+      css: '.card{color:#fff;background:#000;}',
+      js: 'function greet(name){const msg="Hello "+name;return msg}'
+    };
+
+    const formatted = await formatArtifactWithPrettierStandalone(unformatted);
+    assert.ok(formatted.html.includes('\n'));
+    assert.ok(formatted.css.includes('color: #fff;'));
+    assert.ok(formatted.js.includes("const msg = 'Hello ' + name;"));
+    assert.ok(formatted.durationMs >= 1);
+  });
+
+  it('verifies A-ADS Ad Unit 2460701 is embedded in index.html for ads.com / a-ads.com crawler verification', () => {
+    const indexHtml = fs.readFileSync(path.resolve(process.cwd(), 'index.html'), 'utf-8');
+    const verification = verifyAadsEmbedSnippet(indexHtml);
+    assert.equal(verification.unitId, '2460701');
+    assert.equal(verification.hasBeginMarker, true);
+    assert.equal(verification.hasEndMarker, true);
+    assert.equal(verification.hasFrameContainer, true);
+    assert.equal(verification.hasDataAaAttribute, true);
+    assert.equal(verification.hasAcceptableIframeSrc, true);
+    assert.equal(verification.isVerified, true);
   });
 });

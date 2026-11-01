@@ -20,7 +20,9 @@ import {
   PanelLeftOpen,
   Search,
   ChevronRight,
-  FileCode
+  FileCode,
+  History,
+  Calculator
 } from 'lucide-react';
 
 export type WorkspaceNavId =
@@ -29,6 +31,7 @@ export type WorkspaceNavId =
   | 'studio-gallery'
   | 'labs-benchmarker'
   | 'labs-prompt-optimizer'
+  | 'labs-usage-history'
   | 'tool-json'
   | 'tool-rest-curl'
   | 'tool-regex-cron'
@@ -37,6 +40,7 @@ export type WorkspaceNavId =
   | 'tool-stacktrace'
   | 'tool-readme'
   | 'tool-svg-optimizer'
+  | 'tool-roi-calculator'
   | 'tool-color-scale'
   | 'tool-uuid-hash'
   | 'tool-timestamp'
@@ -81,6 +85,7 @@ export const SIDEBAR_CATEGORIES: NavCategory[] = [
         label: 'UI Component Gallery',
         shortLabel: 'Gallery',
         badge: '12',
+        seoSlug: 'free-templates',
         icon: LayoutGrid
       }
     ]
@@ -100,6 +105,13 @@ export const SIDEBAR_CATEGORIES: NavCategory[] = [
         label: 'System Prompt Optimizer',
         shortLabel: 'Prompt AI',
         icon: Sparkles
+      },
+      {
+        id: 'labs-usage-history',
+        label: 'Usage History',
+        shortLabel: 'History',
+        badge: 'Log',
+        icon: History
       }
     ]
   },
@@ -161,6 +173,13 @@ export const SIDEBAR_CATEGORIES: NavCategory[] = [
         shortLabel: 'SVG/JSX',
         seoSlug: 'svg-optimizer',
         icon: FileCode
+      },
+      {
+        id: 'tool-roi-calculator',
+        label: 'AI ROI & Cost Calculator',
+        shortLabel: 'ROI Calc',
+        seoSlug: 'roi-calculator',
+        icon: Calculator
       },
       {
         id: 'tool-color-scale',
@@ -260,6 +279,8 @@ export default function LeftSidebar({
                 return (
                   <button
                     key={item.id}
+                    type="button"
+                    data-testid={`sidebar-nav-${item.id}`}
                     onClick={() => onSelectNav(item.id)}
                     title={collapsed ? item.label : undefined}
                     className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer group ${

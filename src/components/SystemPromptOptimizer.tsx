@@ -113,7 +113,7 @@ export const SystemPromptOptimizer: React.FC<SystemPromptOptimizerProps> = ({
             className="px-4 py-2 rounded-lg bg-[#6366F1] hover:bg-[#818CF8] disabled:opacity-60 text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
           >
             <Sparkles className={`w-3.5 h-3.5 ${isSynthesizingAi ? 'animate-spin' : ''}`} />
-            <span>{isSynthesizingAi ? 'Optimizing with AI...' : '✨ AI Deep Optimize'}</span>
+            <span>{isSynthesizingAi ? 'Optimizing with AI...' : 'AI Deep Optimize'}</span>
           </button>
         </div>
       </div>

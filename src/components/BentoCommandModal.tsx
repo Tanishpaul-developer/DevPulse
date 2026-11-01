@@ -19,7 +19,9 @@ import {
   Sparkles,
   LayoutGrid,
   History,
-  HelpCircle
+  HelpCircle,
+  Calculator,
+  Megaphone
 } from 'lucide-react';
 import {
   SEO_TOOLS_CATALOG,
@@ -39,6 +41,7 @@ interface BentoCommandModalProps {
   onSelectToolSlug: (slug: SeoToolSlug) => void;
   onSelectExtraNav?: (navId: WorkspaceNavId) => void;
   onOpenHosting: () => void;
+  onOpenSponsor?: () => void;
 }
 
 const SLUG_ICON_MAP: Record<SeoToolSlug, React.ComponentType<{ className?: string }>> = {
@@ -53,7 +56,9 @@ const SLUG_ICON_MAP: Record<SeoToolSlug, React.ComponentType<{ className?: strin
   'error-explainer': Bug,
   'readme-generator': FileText,
   'cron-expression': Clock,
-  'svg-optimizer': FileCode
+  'svg-optimizer': FileCode,
+  'roi-calculator': Calculator,
+  'free-templates': LayoutGrid
 };
 
 export default function BentoCommandModal({
@@ -64,7 +69,8 @@ export default function BentoCommandModal({
   recentSlugs = [],
   onSelectToolSlug,
   onSelectExtraNav,
-  onOpenHosting
+  onOpenHosting,
+  onOpenSponsor
 }: BentoCommandModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'All' | SeoToolDefinition['category']>('All');
@@ -423,7 +429,37 @@ export default function BentoCommandModal({
                   }}
                   className="w-full py-2 px-3 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <span>🚀 Deploy Live ($2.99/mo)</span>
+                  <Rocket className="w-3.5 h-3.5" />
+                  <span>Deploy Live ($2.99/mo)</span>
+                </button>
+              </div>
+
+              {/* Self-Serve Bento Sponsor Slot Card */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-fuchsia-950/40 via-white/[0.03] to-indigo-950/40 backdrop-blur-xl border border-fuchsia-500/35 flex flex-col justify-between gap-3">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/30">
+                      Self-Serve Sponsor Slot
+                    </span>
+                    <Megaphone className="w-4 h-4 text-fuchsia-400" />
+                  </div>
+                  <h3 className="text-sm font-bold text-white">
+                    Sponsor DevPulse AI — Reach 50k+ Devs ($49/mo)
+                  </h3>
+                  <p className="text-xs text-zinc-300 leading-relaxed">
+                    Feature your SaaS, AI API, or dev tool across all 14 tool routes with native glass cards.
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    onClose();
+                    if (onOpenSponsor) onOpenSponsor();
+                    else onOpenHosting();
+                  }}
+                  className="w-full py-2 px-3 rounded-xl text-xs font-bold bg-gradient-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Megaphone className="w-3.5 h-3.5" />
+                  <span>Book Sponsor Slot ($49/mo)</span>
                 </button>
               </div>
             </div>

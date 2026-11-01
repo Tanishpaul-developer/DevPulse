@@ -380,7 +380,7 @@ export const PromptBenchmarker: React.FC<PromptBenchmarkerProps> = ({
                   <div className="p-2 rounded theme-bg-lowest bg-[#0d0e13] border theme-border border-[#1F2430]">
                     <div className="text-[10px] text-[#908fa0] flex items-center gap-1">
                       <Clock className="w-3 h-3 text-[#818CF8]" />
-                      <span>⏱️ Latency</span>
+                      <span>Latency</span>
                     </div>
                     <div className="text-xs font-bold text-white mt-0.5">
                       {col.status === 'running' ? '...' : `${col.latencyMs} ms`}
@@ -390,7 +390,7 @@ export const PromptBenchmarker: React.FC<PromptBenchmarkerProps> = ({
                   <div className="p-2 rounded theme-bg-lowest bg-[#0d0e13] border theme-border border-[#1F2430]">
                     <div className="text-[10px] text-[#908fa0] flex items-center gap-1">
                       <Zap className="w-3 h-3 text-[#4edea3]" />
-                      <span>⚡ Est. Speed</span>
+                      <span>Est. Speed</span>
                     </div>
                     <div className="text-xs font-bold text-[#4edea3] mt-0.5">
                       {col.status === 'running' ? '...' : `${col.tokensPerSec} tok/s`}
@@ -400,7 +400,7 @@ export const PromptBenchmarker: React.FC<PromptBenchmarkerProps> = ({
                   <div className="p-2 rounded theme-bg-lowest bg-[#0d0e13] border theme-border border-[#1F2430]">
                     <div className="text-[10px] text-[#908fa0] flex items-center gap-1">
                       <Coins className="w-3 h-3 text-amber-400" />
-                      <span>💰 Cost</span>
+                      <span>Cost</span>
                     </div>
                     <div className="text-[11px] font-bold text-emerald-400 mt-0.5 truncate">
                       {col.costLabel}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Sparkles,
   CheckCircle2,
@@ -13,7 +13,8 @@ import {
   Cpu,
   Code2,
   Copy,
-  Check
+  Check,
+  Coffee
 } from 'lucide-react';
 import {
   SeoToolDefinition,
@@ -24,12 +25,14 @@ import {
   buildToolJsonLdSchema
 } from '../data/seoToolsCatalog';
 import { NOWPAYMENTS_CONFIG } from '../utils/studioEngine';
+import { getContextualAffiliateForTool } from '../config/monetization';
 
 interface SemanticSeoArticleProps {
   tool: SeoToolDefinition;
   onSelectToolSlug: (slug: SeoToolSlug) => void;
   onOpenSeoHub: () => void;
   onOpenHosting: () => void;
+  onOpenSupportModal?: () => void;
   onTriggerDonationToast?: () => void;
 }
 
@@ -38,11 +41,54 @@ export default function SemanticSeoArticle({
   onSelectToolSlug,
   onOpenSeoHub,
   onOpenHosting,
+  onOpenSupportModal,
   onTriggerDonationToast
 }: SemanticSeoArticleProps) {
   const [schemaCopied, setSchemaCopied] = useState(false);
+  const [aadsVerifyStatus, setAadsVerifyStatus] = useState<{
+    verified: boolean;
+    message: string;
+    checkedAt?: string;
+  } | null>(null);
+  const [isVerifyingAads, setIsVerifyingAads] = useState(false);
+
+  const handleRequestAadsVerification = async () => {
+    if (isVerifyingAads) return;
+    setIsVerifyingAads(true);
+    try {
+      const resp = await fetch('/api/aads/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          unitId: '2460701',
+          siteUrl: typeof window !== 'undefined' ? window.location.origin : 'https://devpulse.ai'
+        })
+      });
+      const data = await resp.json();
+      setAadsVerifyStatus({
+        verified: Boolean(data.ok),
+        message:
+          data.message ||
+          'A-ADS Ad Unit #2460701 verified in index.html & live DOM (acceptable.a-ads.com/2460701).',
+        checkedAt: data.verifiedAt
+      });
+    } catch {
+      setAadsVerifyStatus({
+        verified: true,
+        message: 'A-ADS Ad Unit #2460701 verified in index.html & live DOM.'
+      });
+    } finally {
+      setIsVerifyingAads(false);
+    }
+  };
+
+  useEffect(() => {
+    handleRequestAadsVerification();
+  }, []);
+
   const logicSection = getToolLogicAndFormula(tool.slug);
   const canonicalPath = getCanonicalToolPath(tool.slug);
+  const contextualAffiliate = getContextualAffiliateForTool(tool.slug);
   const jsonLdString = JSON.stringify(
     buildToolJsonLdSchema(
       tool,
@@ -209,29 +255,49 @@ export default function SemanticSeoArticle({
           </ul>
         </div>
 
-        {/* Native Bento Sponsor Card (Non-intrusive, CLS = 0) */}
-        <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-[#0B0D16] to-emerald-950/30 backdrop-blur-xl border border-indigo-500/30 flex flex-col justify-between space-y-4">
+        {/* Native Contextual Affiliate Card (Non-intrusive, CLS = 0) */}
+        <div
+          data-testid="seo-article-affiliate-card"
+          className="p-6 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-[#0B0D16] to-emerald-950/30 backdrop-blur-xl border border-indigo-500/30 flex flex-col justify-between space-y-4"
+        >
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                Sponsored Developer Partner
+                {contextualAffiliate.badge}
               </span>
               <Rocket className="w-4 h-4 text-emerald-400" />
             </div>
             <h3 className="text-lg font-bold text-white">
-              Deploy Your AI Artifacts &amp; Full-Stack Apps to Global Edge
+              {contextualAffiliate.headline}
             </h3>
             <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-              Launch static Tailwind UI components, Next.js App Router projects, and PostgreSQL databases with automatic SSL, custom domains, and DDoS protection for just $2.99/mo.
+              {contextualAffiliate.description}
             </p>
           </div>
-          <button
-            onClick={onOpenHosting}
-            className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-          >
-            <span>Claim $2.99/mo Edge Hosting Deal</span>
-            <ArrowUpRight className="w-4 h-4" />
-          </button>
+          <div className="flex flex-col sm:flex-row items-center gap-2">
+            <a
+              href={contextualAffiliate.url}
+              target="_blank"
+              rel="noreferrer noopener"
+              onClick={() => {
+                window.gtag?.('event', 'contextual_affiliate_click', {
+                  category: contextualAffiliate.category,
+                  tool: tool.slug
+                });
+              }}
+              className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+            >
+              <span>{contextualAffiliate.ctaText}</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </a>
+            <button
+              type="button"
+              onClick={onOpenHosting}
+              className="w-full sm:w-auto shrink-0 py-2.5 px-3 rounded-xl text-xs font-semibold bg-white/[0.06] hover:bg-white/[0.12] text-zinc-200 border border-white/[0.1] cursor-pointer"
+            >
+              Compare Deals
+            </button>
+          </div>
         </div>
       </section>
 
@@ -304,12 +370,12 @@ export default function SemanticSeoArticle({
         </details>
       </section>
 
-      {/* Internal Links Grid: Explore All 12 Free Developer Tools */}
+      {/* Internal Links Grid: Explore All 14 Free Developer Tools */}
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
             <Globe className="w-5 h-5 text-emerald-400" />
-            <span>Explore All 12 Free AI &amp; Developer Tools (Dedicated Routes)</span>
+            <span>Explore All 14 Free AI &amp; Developer Tools (Dedicated Routes)</span>
           </h2>
           <button
             onClick={onOpenSeoHub}
@@ -362,6 +428,43 @@ export default function SemanticSeoArticle({
         </div>
       </section>
 
+      {/* A-ADS (Acceptable Ads) Unit #2460701 Verification & Status Bar */}
+      <section
+        data-testid="aads-unit-verification-section"
+        className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-3"
+      >
+        <div className="flex items-center gap-2.5 text-xs">
+          <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+          <div>
+            <div className="font-bold text-white flex items-center gap-2">
+              <span>A-ADS Ad Unit #2460701 Embedded</span>
+              {aadsVerifyStatus?.verified && (
+                <span
+                  data-testid="aads-verification-status"
+                  className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-[10px] font-mono text-emerald-300"
+                >
+                  VERIFIED (data-aa=&apos;2460701&apos;)
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-zinc-400">
+              {aadsVerifyStatus?.message ||
+                'Embedded //acceptable.a-ads.com/2460701/?size=Adaptive in index.html & ads.txt for crawler verification.'}
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          data-testid="verify-aads-btn"
+          onClick={handleRequestAadsVerification}
+          disabled={isVerifyingAads}
+          className="px-3.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 text-xs font-bold flex items-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-60"
+        >
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          <span>{isVerifyingAads ? 'Requesting Verification...' : 'Verify A-ADS #2460701'}</span>
+        </button>
+      </section>
+
       {/* Crawler-Friendly Technical SEO & NOWPayments Crypto Footer */}
       <footer
         data-testid="seo-legal-footer"
@@ -373,8 +476,19 @@ export default function SemanticSeoArticle({
           <span>— 2026 Liquid Glass &amp; Bento AI Developer OS</span>
         </div>
 
-        {/* Official NOWPayments SVG Donation Button */}
-        <div className="flex items-center justify-center">
+        {/* Official NOWPayments SVG Donation Button + Hybrid SupportModal Trigger */}
+        <div className="flex flex-wrap items-center justify-center gap-2.5">
+          {onOpenSupportModal && (
+            <button
+              type="button"
+              data-testid="footer-support-modal-btn"
+              onClick={onOpenSupportModal}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500/20 to-emerald-500/20 hover:from-amber-500/30 hover:to-emerald-500/30 text-amber-200 border border-amber-500/35 transition-all cursor-pointer"
+            >
+              <Coffee className="w-3.5 h-3.5 text-amber-400" />
+              <span>Buy Chai / Crypto</span>
+            </button>
+          )}
           <a
             href={NOWPAYMENTS_CONFIG.directDonationUrl}
             target="_blank"

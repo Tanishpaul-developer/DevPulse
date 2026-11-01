@@ -1,6 +1,7 @@
 import { consumeGenerationToken, getRemainingTokens, type StorageAdapter } from '../utils/rateLimiter.ts';
 import { sanitizeBrokenJson } from '../utils/jsonTools.ts';
 import { analyzeStackTraceDeterministic, type StackTraceAnalysis } from '../utils/stackTraceParser.ts';
+import { recordAiUsageHistoryEntry } from '../utils/studioEngine.ts';
 
 export type ModelOptionId =
   | 'gemini-3.8-flash'
@@ -447,16 +448,28 @@ export async function generateWithFailover(params: {
 
   const data = await res.json();
   const text: string = data.text || '';
-  const estimatedTokens = Math.max(16, Math.round(text.length / 3.8));
-  const tokensPerSec = Math.max(25, Math.round((estimatedTokens / elapsedMs) * 1000));
+  const estimatedTokens = Math.max(16, Math.round((params.prompt.length + text.length) / 3.8));
+  const finalLatencyMs = data.latencyMs || elapsedMs;
+  const tokensPerSec = Math.max(25, Math.round((estimatedTokens / finalLatencyMs) * 1000));
+  const resolvedModelUsed = data.modelUsed || reqConfig.model;
+  const resolvedProviderUsed = data.providerUsed || 'Google Gemini Auto-Rotator';
+
+  recordAiUsageHistoryEntry({
+    modelUsed: resolvedModelUsed,
+    providerUsed: resolvedProviderUsed,
+    prompt: params.prompt,
+    responseText: text,
+    latencyMs: finalLatencyMs,
+    estimatedTokens,
+  });
 
   return {
     text,
-    providerUsed: data.providerUsed || 'Google Gemini Auto-Rotator',
-    modelUsed: data.modelUsed || reqConfig.model,
+    providerUsed: resolvedProviderUsed,
+    modelUsed: resolvedModelUsed,
     failoverTriggered: Boolean(data.failoverTriggered),
     failoverChain: Array.isArray(data.failoverChain) ? data.failoverChain : [reqConfig.model],
-    latencyMs: data.latencyMs || elapsedMs,
+    latencyMs: finalLatencyMs,
     tokensPerSec: data.tokensPerSec || tokensPerSec,
     estimatedTokens,
     groundingUrls: data.groundingUrls || [],

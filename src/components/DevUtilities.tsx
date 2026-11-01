@@ -20,9 +20,11 @@ import {
   FileText,
   Send,
   Table,
-  FileCode
+  FileCode,
+  Calculator
 } from 'lucide-react';
 import { ModelId } from '../types';
+import { calculateEngineeringRoi } from '../utils/studioEngine';
 import { sanitizeBrokenJson, jsonToTypeScriptInterfaces } from '../utils/jsonTools';
 import { diagnoseStackTraceWithAi, generateSvgAssetWithAi } from '../services/aiRouter';
 import {
@@ -203,6 +205,23 @@ export default function DevUtilities({
 </svg>`);
   const [isGeneratingSvg, setIsGeneratingSvg] = useState(false);
 
+  // 13. AI Engineering ROI & Token Cost Calculator State (/tools/roi-calculator)
+  const [roiDevelopersCount, setRoiDevelopersCount] = useState<number>(8);
+  const [roiHourlyRateUsd, setRoiHourlyRateUsd] = useState<number>(85);
+  const [roiHoursSavedPerWeek, setRoiHoursSavedPerWeek] = useState<number>(6.5);
+  const [roiMonthlyPromptsPerDev, setRoiMonthlyPromptsPerDev] = useState<number>(450);
+
+  const roiMetrics = useMemo(
+    () =>
+      calculateEngineeringRoi({
+        developersCount: roiDevelopersCount,
+        hourlyRateUsd: roiHourlyRateUsd,
+        hoursSavedPerDevPerWeek: roiHoursSavedPerWeek,
+        monthlyPromptsPerDev: roiMonthlyPromptsPerDev
+      }),
+    [roiDevelopersCount, roiHourlyRateUsd, roiHoursSavedPerWeek, roiMonthlyPromptsPerDev]
+  );
+
   const copyText = (id: string, text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
@@ -363,6 +382,7 @@ export default function DevUtilities({
     { id: 'tool-stacktrace', label: 'Stack Trace Healer', icon: Bug },
     { id: 'tool-readme', label: 'README Generator', icon: FileText },
     { id: 'tool-svg-optimizer', label: 'SVG Optimizer & JSX', icon: FileCode },
+    { id: 'tool-roi-calculator', label: 'AI ROI Calculator', icon: Calculator },
     { id: 'tool-color-scale', label: 'Tailwind Colors', icon: Palette },
     { id: 'tool-uuid-hash', label: 'UUID & Hash', icon: Hash },
     { id: 'tool-timestamp', label: 'Epoch Time', icon: Clock },
@@ -1423,6 +1443,158 @@ export default function DevUtilities({
               className="w-full h-full flex items-center justify-center"
               dangerouslySetInnerHTML={{ __html: svgCode }}
             />
+          </div>
+        </div>
+      )}
+
+      {/* 13. AI ENGINEERING ROI & TOKEN COST CALCULATOR (/tools/roi-calculator) */}
+      {activeToolId === 'tool-roi-calculator' && (
+        <div
+          data-testid="roi-calculator-workbench"
+          className="p-5 sm:p-6 rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] space-y-6"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Calculator className="w-5 h-5 text-emerald-400" />
+                <span>AI Engineering ROI &amp; Token Cost Calculator</span>
+              </h2>
+              <p className="text-xs text-zinc-400">
+                Model engineering hours saved, monthly &amp; annual payroll savings, and net ROI vs API token costs.
+              </p>
+            </div>
+            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              Net ROI: {roiMetrics.roiMultiple}x ({roiMetrics.paybackDays}d payback)
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Sliders / Inputs */}
+            <div className="lg:col-span-5 p-4 rounded-2xl bg-black/50 border border-white/[0.08] space-y-4">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <label htmlFor="roi-devs" className="font-semibold text-zinc-300">
+                    Engineering Team Size
+                  </label>
+                  <span className="font-mono font-bold text-indigo-300">{roiDevelopersCount} devs</span>
+                </div>
+                <input
+                  id="roi-devs"
+                  type="range"
+                  min={1}
+                  max={100}
+                  value={roiDevelopersCount}
+                  onChange={(e) => setRoiDevelopersCount(Number(e.target.value))}
+                  className="w-full accent-indigo-500 cursor-pointer"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <label htmlFor="roi-rate" className="font-semibold text-zinc-300">
+                    Blended Developer Hourly Rate (USD)
+                  </label>
+                  <span className="font-mono font-bold text-emerald-300">${roiHourlyRateUsd}/hr</span>
+                </div>
+                <input
+                  id="roi-rate"
+                  type="range"
+                  min={15}
+                  max={250}
+                  step={5}
+                  value={roiHourlyRateUsd}
+                  onChange={(e) => setRoiHourlyRateUsd(Number(e.target.value))}
+                  className="w-full accent-emerald-500 cursor-pointer"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <label htmlFor="roi-hours" className="font-semibold text-zinc-300">
+                    Hours Saved per Developer / Week
+                  </label>
+                  <span className="font-mono font-bold text-amber-300">{roiHoursSavedPerWeek} hrs/wk</span>
+                </div>
+                <input
+                  id="roi-hours"
+                  type="range"
+                  min={1}
+                  max={25}
+                  step={0.5}
+                  value={roiHoursSavedPerWeek}
+                  onChange={(e) => setRoiHoursSavedPerWeek(Number(e.target.value))}
+                  className="w-full accent-amber-500 cursor-pointer"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <label htmlFor="roi-prompts" className="font-semibold text-zinc-300">
+                    Monthly AI Prompts per Developer
+                  </label>
+                  <span className="font-mono font-bold text-fuchsia-300">{roiMonthlyPromptsPerDev} prompts</span>
+                </div>
+                <input
+                  id="roi-prompts"
+                  type="range"
+                  min={50}
+                  max={3000}
+                  step={50}
+                  value={roiMonthlyPromptsPerDev}
+                  onChange={(e) => setRoiMonthlyPromptsPerDev(Number(e.target.value))}
+                  className="w-full accent-fuchsia-500 cursor-pointer"
+                />
+              </div>
+            </div>
+
+            {/* Output Telemetry Cards */}
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="p-4 rounded-2xl bg-black/60 border border-emerald-500/30 space-y-1">
+                <span className="text-[11px] font-mono uppercase text-zinc-400">Net Monthly Engineering Savings</span>
+                <div
+                  data-testid="roi-net-monthly-savings"
+                  className="text-2xl font-extrabold font-mono text-emerald-400"
+                >
+                  ${roiMetrics.netMonthlySavingsUsd.toLocaleString()}/mo
+                </div>
+                <p className="text-[11px] text-zinc-400">
+                  {roiMetrics.monthlyHoursSaved} engineering hours reclaimed per month
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-black/60 border border-indigo-500/30 space-y-1">
+                <span className="text-[11px] font-mono uppercase text-zinc-400">Annualized Productivity Gain</span>
+                <div
+                  data-testid="roi-annual-savings"
+                  className="text-2xl font-extrabold font-mono text-indigo-300"
+                >
+                  ${roiMetrics.annualSavingsUsd.toLocaleString()}/yr
+                </div>
+                <p className="text-[11px] text-zinc-400">
+                  Equivalent to {(roiMetrics.monthlyHoursSaved / 160).toFixed(1)} full-time engineers added
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-black/60 border border-white/[0.08] space-y-1">
+                <span className="text-[11px] font-mono uppercase text-zinc-400">Est. Monthly BYOK API Token Spend</span>
+                <div className="text-xl font-bold font-mono text-amber-300">
+                  ${roiMetrics.estimatedMonthlyTokenCostUsd.toFixed(2)}/mo
+                </div>
+                <p className="text-[11px] text-zinc-400">
+                  Zero seat markup on DevPulse AI (vs ${(roiDevelopersCount * 20).toLocaleString()}/mo SaaS seats)
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-black/60 border border-white/[0.08] space-y-1">
+                <span className="text-[11px] font-mono uppercase text-zinc-400">Return Multiple &amp; Payback</span>
+                <div className="text-xl font-bold font-mono text-white">
+                  {roiMetrics.roiMultiple}x Return • {roiMetrics.paybackDays} Day Payback
+                </div>
+                <p className="text-[11px] text-zinc-400">
+                  Immediate positive unit economics from day 1
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}

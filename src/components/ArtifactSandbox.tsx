@@ -46,7 +46,12 @@ import {
   Layers,
   QrCode,
   FolderArchive,
-  Activity
+  Activity,
+  FlaskConical,
+  Users,
+  MousePointer2,
+  CheckCircle2,
+  Github
 } from 'lucide-react';
 import {
   ArtifactCodeState,
@@ -57,7 +62,7 @@ import {
   VersionSnapshot,
   ModelParameters
 } from '../types';
-import { buildSandboxSrcDoc } from '../utils/urlHash';
+import { buildSandboxSrcDoc, encodeArtifactToHash } from '../utils/urlHash';
 import {
   generateArtifactCode,
   refactorCodeBlock,
@@ -85,9 +90,21 @@ import {
   computeCodeHealthMetrics,
   buildShareableArtifactUrl,
   generateUrlQrCodeSvg,
-  generateProjectZipArchive
+  generateProjectZipArchive,
+  generateAllSavedSnippetsZipArchive,
+  buildVercelDeploymentPayload,
+  runArtifactJestSuite,
+  ArtifactTestSuiteResult,
+  CollaboratorPresence,
+  CollabRealtimeEvent,
+  createLocalCollaboratorProfile,
+  applyCollaboratorCursorEvent,
+  injectViralWatermarkBadge,
+  submitIdeExportForm,
+  deriveArtifactPresenceRoomId
 } from '../utils/studioEngine';
-import GitRepoModal from './GitRepoModal';
+import { formatArtifactWithPrettierWorker } from '../utils/prettierWorkerClient';
+import GitRepoModal, { GITHUB_OAUTH_STORAGE_KEY, GitHubOAuthUser } from './GitRepoModal';
 
 interface ArtifactSandboxProps {
   codeState: ArtifactCodeState;
@@ -211,6 +228,8 @@ export default function ArtifactSandbox({
   shareCopied,
   savedSnippets,
   onSaveSnippet,
+  onLoadSnippet,
+  onDeleteSnippet,
   saveTriggerCount = 0,
   runTriggerCount = 0,
   gitTriggerCount = 0,
@@ -275,14 +294,32 @@ export default function ArtifactSandbox({
   const [projectZipped, setProjectZipped] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [resetSuccessBanner, setResetSuccessBanner] = useState(false);
+  const [includeViralBadge, setIncludeViralBadge] = useState(true);
+  const [isIdeExportOpen, setIsIdeExportOpen] = useState(false);
 
   // Side drawers & modals
   const [showDependenciesDrawer, setShowDependenciesDrawer] = useState(false);
   const [showHistoryDrawer, setShowHistoryDrawer] = useState(false);
+  const [showSavedSnippetsDrawer, setShowSavedSnippetsDrawer] = useState(false);
+  const [allSnippetsZipped, setAllSnippetsZipped] = useState(false);
   const [showParamsDrawer, setShowParamsDrawer] = useState(false);
   const [showSeoDrawer, setShowSeoDrawer] = useState(false);
   const [showConsolePanel, setShowConsolePanel] = useState(false);
   const [isGitModalOpen, setIsGitModalOpen] = useState(false);
+  const [gitModalInitialTarget, setGitModalInitialTarget] = useState<'repo' | 'gist'>('repo');
+  const [isFormattingPrettier, setIsFormattingPrettier] = useState(false);
+  const [connectedGitHubUser, setConnectedGitHubUser] = useState<GitHubOAuthUser | null>(() => {
+    try {
+      const saved = localStorage.getItem(GITHUB_OAUTH_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed?.user?.login) return parsed.user;
+      }
+    } catch {
+      // ignore
+    }
+    return null;
+  });
 
   // Save Snippet input
   const [snippetTitleInput, setSnippetTitleInput] = useState('');
@@ -337,6 +374,153 @@ export default function ArtifactSandbox({
     useState<SavedStarterTemplate['category']>('Custom Boilerplate');
   const [templateSearchQuery, setTemplateSearchQuery] = useState('');
   const [templateSavedBanner, setTemplateSavedBanner] = useState(false);
+
+  // 1. Deploy to Vercel API State
+  const [isDeployingVercel, setIsDeployingVercel] = useState(false);
+  const [isVercelModalOpen, setIsVercelModalOpen] = useState(false);
+  const [vercelTokenInput, setVercelTokenInput] = useState('');
+  const [vercelDeployCopied, setVercelDeployCopied] = useState(false);
+  const [vercelDeployResult, setVercelDeployResult] = useState<{
+    id: string;
+    name: string;
+    url: string;
+    vercelAliasUrl?: string;
+    inspectorUrl: string;
+    readyState: string;
+    createdAt: number;
+    mode: string;
+    filesDeployed: string[];
+  } | null>(null);
+
+  // 2. Jest-Like Test Runner Suite State
+  const [lastTestSuiteResult, setLastTestSuiteResult] = useState<ArtifactTestSuiteResult | null>(null);
+
+  // 3. Real-Time Multi-User Presence & Cursor Tracking State (WebSocket + Server SSE + WebRTC BroadcastChannel)
+  const localCollabProfile = useMemo(() => {
+    let savedId = '';
+    try {
+      savedId = sessionStorage.getItem('devpulse_collab_client_id') || '';
+      if (!savedId) {
+        savedId = `peer-${Math.random().toString(36).slice(2, 8)}`;
+        sessionStorage.setItem('devpulse_collab_client_id', savedId);
+      }
+    } catch {
+      savedId = `peer-${Math.random().toString(36).slice(2, 8)}`;
+    }
+    return createLocalCollaboratorProfile(savedId);
+  }, []);
+
+  const shareableArtifactUrl = useMemo(() => {
+    const origin =
+      typeof window !== 'undefined' && window.location.origin
+        ? window.location.origin
+        : 'https://yourdomain.com';
+    return buildShareableArtifactUrl(codeState, activeToolSlug, origin);
+  }, [codeState, activeToolSlug]);
+
+  const collabRoomId = useMemo(
+    () => deriveArtifactPresenceRoomId(shareableArtifactUrl, activeToolSlug),
+    [shareableArtifactUrl, activeToolSlug]
+  );
+
+  const [remotePeers, setRemotePeers] = useState<CollaboratorPresence[]>([]);
+  const [showRemoteCursors, setShowRemoteCursors] = useState(true);
+  const [presenceTransport, setPresenceTransport] = useState<'WebSocket' | 'SSE'>('WebSocket');
+  const lastCursorEmitRef = useRef<number>(0);
+  const broadcastChannelRef = useRef<BroadcastChannel | null>(null);
+  const wsClientRef = useRef<WebSocket | null>(null);
+  const sandboxContainerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    let ws: WebSocket | null = null;
+    try {
+      if (typeof window !== 'undefined' && typeof WebSocket !== 'undefined') {
+        const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const qs = new URLSearchParams({
+          roomId: collabRoomId,
+          clientId: localCollabProfile.clientId,
+          name: localCollabProfile.name,
+          color: localCollabProfile.color
+        });
+        ws = new WebSocket(`${wsProto}//${window.location.host}/ws/collab?${qs.toString()}`);
+        wsClientRef.current = ws;
+        ws.onopen = () => {
+          setPresenceTransport('WebSocket');
+        };
+        ws.onmessage = (evt) => {
+          try {
+            const parsed = JSON.parse(String(evt.data)) as CollabRealtimeEvent;
+            setRemotePeers((prev) =>
+              applyCollaboratorCursorEvent(prev, parsed, localCollabProfile.clientId)
+            );
+          } catch {
+            // ignore malformed WebSocket frame
+          }
+        };
+      }
+    } catch {
+      // fallback to SSE below
+    }
+
+    let eventSource: EventSource | null = null;
+    try {
+      const qs = new URLSearchParams({
+        roomId: collabRoomId,
+        clientId: localCollabProfile.clientId,
+        name: localCollabProfile.name,
+        color: localCollabProfile.color
+      });
+      eventSource = new EventSource(`/api/collab/stream?${qs.toString()}`);
+      eventSource.onmessage = (evt) => {
+        try {
+          const parsed = JSON.parse(evt.data) as CollabRealtimeEvent;
+          setRemotePeers((prev) =>
+            applyCollaboratorCursorEvent(prev, parsed, localCollabProfile.clientId)
+          );
+        } catch {
+          // ignore malformed SSE frame
+        }
+      };
+    } catch {
+      // ignore SSE setup errors in offline environments
+    }
+
+    let channel: BroadcastChannel | null = null;
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        channel = new BroadcastChannel(`devpulse_collab_${collabRoomId}`);
+        broadcastChannelRef.current = channel;
+        channel.onmessage = (evt) => {
+          const data = evt.data as CollabRealtimeEvent;
+          if (data && data.type) {
+            setRemotePeers((prev) =>
+              applyCollaboratorCursorEvent(prev, data, localCollabProfile.clientId)
+            );
+          }
+        };
+        channel.postMessage({
+          type: 'user:joined',
+          roomId: collabRoomId,
+          peer: localCollabProfile,
+          timestamp: Date.now()
+        } satisfies CollabRealtimeEvent);
+      }
+    } catch {
+      // ignore BroadcastChannel errors
+    }
+
+    return () => {
+      try {
+        ws?.close();
+      } catch {
+        // ignore
+      }
+      wsClientRef.current = null;
+      eventSource?.close();
+      channel?.close();
+      broadcastChannelRef.current = null;
+    };
+  }, [collabRoomId, localCollabProfile]);
 
   // Version history snapshots in localStorage
   const [versionHistory, setVersionHistory] = useState<VersionSnapshot[]>(() => {
@@ -500,20 +684,42 @@ export default function ArtifactSandbox({
     setLastLatency(res.latencyMs);
   };
 
-  const handleFormatCode = () => {
+  const handleFormatCode = async () => {
+    if (isFormattingPrettier) return;
     if (exportFramework !== 'html') {
       setExportFramework('html');
     }
-    const nextState: ArtifactCodeState = {
-      ...codeState,
-      html: formatArtifactCode(codeState.html, 'html'),
-      css: codeState.css ? formatArtifactCode(codeState.css, 'css') : '',
-      js: codeState.js ? formatArtifactCode(codeState.js, 'js') : ''
-    };
-    onChangeCode(nextState);
-    pushVersionSnapshot('Formatted Code (Prettier Engine)', nextState);
-    setFormatSuccess(true);
-    setTimeout(() => setFormatSuccess(false), 1800);
+    setIsFormattingPrettier(true);
+    try {
+      const result = await formatArtifactWithPrettierWorker(codeState);
+      const nextState: ArtifactCodeState = {
+        ...codeState,
+        html: result.html,
+        css: result.css,
+        js: result.js
+      };
+      onChangeCode(nextState);
+      pushVersionSnapshot(
+        `Formatted Code (${result.formattedBy} in ${result.durationMs}ms)`,
+        nextState
+      );
+      setLastProviderBadge(`Prettier Worker (${result.durationMs}ms)`);
+      setFormatSuccess(true);
+      setTimeout(() => setFormatSuccess(false), 1800);
+    } catch {
+      const nextState: ArtifactCodeState = {
+        ...codeState,
+        html: formatArtifactCode(codeState.html, 'html'),
+        css: codeState.css ? formatArtifactCode(codeState.css, 'css') : '',
+        js: codeState.js ? formatArtifactCode(codeState.js, 'js') : ''
+      };
+      onChangeCode(nextState);
+      pushVersionSnapshot('Formatted Code (Prettier Engine)', nextState);
+      setFormatSuccess(true);
+      setTimeout(() => setFormatSuccess(false), 1800);
+    } finally {
+      setIsFormattingPrettier(false);
+    }
   };
 
   const handleTextareaSelect = () => {
@@ -742,14 +948,6 @@ export default function ArtifactSandbox({
     });
   }, [activeToolSlug, activeToolName, activeToolDescription, codeState]);
 
-  const shareableArtifactUrl = useMemo(() => {
-    const origin =
-      typeof window !== 'undefined' && window.location.origin
-        ? window.location.origin
-        : 'https://yourdomain.com';
-    return buildShareableArtifactUrl(codeState, activeToolSlug, origin);
-  }, [codeState, activeToolSlug]);
-
   const artifactQrCode = useMemo(
     () => generateUrlQrCodeSvg(shareableArtifactUrl, 140),
     [shareableArtifactUrl]
@@ -810,8 +1008,40 @@ export default function ArtifactSandbox({
     setTimeout(() => setProjectZipped(false), 2500);
   };
 
+  const handleDownloadAllSavedSnippetsZip = () => {
+    const snippetsToExport =
+      savedSnippets.length > 0
+        ? savedSnippets
+        : [
+            {
+              id: 'current-artifact',
+              title: codeState.seoTitle || codeState.prompt || 'Current Artifact',
+              codeState,
+              createdAt: Date.now()
+            }
+          ];
+    const { zipBytes, filename } = generateAllSavedSnippetsZipArchive(snippetsToExport);
+    const blob = new Blob([zipBytes], { type: 'application/zip' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    setAllSnippetsZipped(true);
+    setTimeout(() => setAllSnippetsZipped(false), 2500);
+  };
+
   const handleDownloadHtml = () => {
-    const content = exportFramework === 'html' ? srcDoc : exportedFrameworkView.code;
+    const origin =
+      typeof window !== 'undefined' && window.location.origin
+        ? window.location.origin
+        : 'https://devpulse.ai';
+    const rawHtmlDoc = exportFramework === 'html' ? srcDoc : exportedFrameworkView.code;
+    const content =
+      exportFramework === 'html'
+        ? injectViralWatermarkBadge(rawHtmlDoc, origin, includeViralBadge)
+        : rawHtmlDoc;
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -819,6 +1049,36 @@ export default function ArtifactSandbox({
     a.download = exportFramework === 'html' ? `devpulse-artifact-${Date.now()}.html` : exportedFrameworkView.filename;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleShareLiveUrlWithWatermark = () => {
+    const origin =
+      typeof window !== 'undefined' && window.location.origin
+        ? window.location.origin
+        : 'https://devpulse.ai';
+    if (includeViralBadge) {
+      const watermarkedState: ArtifactCodeState = {
+        ...codeState,
+        html: injectViralWatermarkBadge(codeState.html, origin, true)
+      };
+      const hash = encodeArtifactToHash(watermarkedState);
+      window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}${hash}`);
+      navigator.clipboard?.writeText(window.location.href)?.catch(() => {});
+    }
+    onShareUrl();
+  };
+
+  const handleExportToIde = (ide: 'codepen' | 'stackblitz' | 'jsfiddle') => {
+    const origin =
+      typeof window !== 'undefined' && window.location.origin
+        ? window.location.origin
+        : 'https://devpulse.ai';
+    submitIdeExportForm(ide, codeState, {
+      includeViralBadge,
+      origin,
+      title: codeState.seoTitle || 'DevPulse AI Artifact'
+    });
+    setIsIdeExportOpen(false);
   };
 
   const handleConfirmSaveSnippet = () => {
@@ -927,6 +1187,164 @@ export default function ArtifactSandbox({
     );
   }, [starterTemplates, templateSearchQuery]);
 
+  const handleRunTestsSuite = () => {
+    const suiteResult = runArtifactJestSuite(codeState);
+    setLastTestSuiteResult(suiteResult);
+    setShowConsolePanel(true);
+    setConsoleFilter('all');
+    setConsoleSearchQuery('');
+
+    const now = Date.now();
+    const newEntries: ConsoleLogEntry[] = suiteResult.consoleFormattedLines.map((line, idx) => ({
+      id: `jest-${now}-${idx}`,
+      level: line.level,
+      message: line.message,
+      timestamp: now + idx
+    }));
+
+    setConsoleLogs((prev) => [...prev, ...newEntries]);
+  };
+
+  const handleDeployToVercel = async (customToken?: string) => {
+    if (isDeployingVercel) return;
+    setIsDeployingVercel(true);
+    const payload = buildVercelDeploymentPayload(codeState);
+
+    try {
+      const response = await fetch('/api/deploy-vercel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          payload,
+          vercelToken: (customToken ?? vercelTokenInput).trim()
+        })
+      });
+      const data = await response.json();
+      if (data && data.deployment) {
+        setVercelDeployResult(data.deployment);
+        setIsVercelModalOpen(true);
+        setConsoleLogs((prev) => [
+          ...prev,
+          {
+            id: `vercel-deploy-${Date.now()}`,
+            level: 'log',
+            message: `[Vercel API v13] Deployed standalone project "${data.deployment.name}" (${data.deployment.filesDeployed.join(', ')}) → ${data.deployment.vercelAliasUrl || data.deployment.url}`,
+            timestamp: Date.now()
+          }
+        ]);
+      }
+    } catch (err) {
+      setConsoleLogs((prev) => [
+        ...prev,
+        {
+          id: `vercel-err-${Date.now()}`,
+          level: 'error',
+          message: `[Vercel Deploy Error] ${err instanceof Error ? err.message : 'Network error'}`,
+          timestamp: Date.now()
+        }
+      ]);
+    } finally {
+      setIsDeployingVercel(false);
+    }
+  };
+
+  const handleSandboxMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const now = Date.now();
+    if (now - lastCursorEmitRef.current < 80) return;
+    lastCursorEmitRef.current = now;
+
+    const rect = sandboxContainerRef.current?.getBoundingClientRect();
+    if (!rect || rect.width === 0 || rect.height === 0) return;
+
+    const xPercent = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+    const yPercent = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+
+    const updatedSelf: CollaboratorPresence = {
+      ...localCollabProfile,
+      xPercent: Math.min(98, Math.max(2, xPercent)),
+      yPercent: Math.min(98, Math.max(2, yPercent)),
+      activeTab: studioMode,
+      lastUpdatedAt: now
+    };
+
+    try {
+      if (wsClientRef.current && wsClientRef.current.readyState === WebSocket.OPEN) {
+        wsClientRef.current.send(
+          JSON.stringify({
+            type: 'cursor:moved',
+            roomId: collabRoomId,
+            peer: updatedSelf,
+            timestamp: now
+          })
+        );
+      }
+    } catch {
+      // ignore
+    }
+
+    try {
+      broadcastChannelRef.current?.postMessage({
+        type: 'cursor:moved',
+        roomId: collabRoomId,
+        peer: updatedSelf,
+        timestamp: now
+      } satisfies CollabRealtimeEvent);
+    } catch {
+      // ignore
+    }
+
+    fetch('/api/collab/event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        roomId: collabRoomId,
+        type: 'cursor:moved',
+        peer: updatedSelf
+      })
+    }).catch(() => {});
+  };
+
+  const handleSpawnCollaboratorCursor = async () => {
+    const peerProfile = createLocalCollaboratorProfile(
+      `peer-live-${Math.random().toString(36).slice(2, 6)}`
+    );
+    const positionedPeer: CollaboratorPresence = {
+      ...peerProfile,
+      xPercent: Math.floor(25 + Math.random() * 55),
+      yPercent: Math.floor(28 + Math.random() * 48),
+      activeTab: studioMode,
+      lastUpdatedAt: Date.now()
+    };
+
+    setShowRemoteCursors(true);
+    setRemotePeers((prev) =>
+      applyCollaboratorCursorEvent(
+        prev,
+        {
+          type: 'cursor:moved',
+          roomId: collabRoomId,
+          peer: positionedPeer,
+          timestamp: Date.now()
+        },
+        localCollabProfile.clientId
+      )
+    );
+
+    try {
+      await fetch('/api/collab/event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomId: collabRoomId,
+          type: 'cursor:moved',
+          peer: positionedPeer
+        })
+      });
+    } catch {
+      // ignore
+    }
+  };
+
   const activeDependencies = codeState.dependencies || [];
   const filteredLogs = filterConsoleLogs(consoleLogs, consoleFilter, consoleSearchQuery);
   const errorCount = consoleLogs.filter((l) => l.level === 'error').length;
@@ -935,7 +1353,11 @@ export default function ArtifactSandbox({
   const showPreviewPane = isFullscreen || studioMode === 'preview' || studioMode === 'split';
 
   return (
-    <div className="flex flex-col min-h-[780px] bg-[#06070B] relative overflow-hidden">
+    <div
+      ref={sandboxContainerRef}
+      onMouseMove={handleSandboxMouseMove}
+      className="flex flex-col min-h-[780px] bg-[#06070B] relative overflow-hidden"
+    >
       {/* Liquid Glass Top Workspace Control Bar: Segmented Pill Switcher + Floating AI Prompt Bar */}
       <div className="px-3 sm:px-5 py-3 border-b border-white/[0.08] bg-white/[0.02] backdrop-blur-2xl space-y-3">
         {/* Top Row: Segmented Pill Switcher + Studio Utility Pills */}
@@ -990,6 +1412,99 @@ export default function ArtifactSandbox({
                 {new Date(internalAutoSavedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
               </span>
             </div>
+
+            {/* Real-Time Shareable Artifact URL Presence Pill (WebSocket + SSE) */}
+            <div
+              data-testid="collab-presence-badge"
+              title={`Real-time presence room for this shareable artifact URL (${collabRoomId}) via ${presenceTransport}`}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-xs text-indigo-200"
+            >
+              <button
+                type="button"
+                data-testid="toggle-collab-cursors-btn"
+                onClick={() => setShowRemoteCursors((prev) => !prev)}
+                title="Toggle real-time multi-user presence & cursor tracking overlay for this shareable artifact URL"
+                className="flex items-center gap-1.5 cursor-pointer"
+              >
+                <Users className="w-3.5 h-3.5 text-indigo-400" />
+                <span className="font-semibold" data-testid="presence-viewer-count">
+                  {remotePeers.length + 1} Viewing Artifact URL
+                </span>
+                <span
+                  data-testid="presence-room-pill"
+                  className="hidden sm:inline-block px-1.5 py-0.2 rounded bg-indigo-500/20 text-[10px] font-mono text-indigo-300"
+                >
+                  {presenceTransport} • #{collabRoomId.slice(-6)}
+                </span>
+              </button>
+              <div className="flex items-center -space-x-1.5 ml-0.5">
+                <span
+                  title={`You: ${localCollabProfile.name}`}
+                  style={{ backgroundColor: localCollabProfile.color }}
+                  className="w-4 h-4 rounded-full text-[9px] font-bold text-black flex items-center justify-center ring-1 ring-black"
+                >
+                  {localCollabProfile.name.charAt(0)}
+                </span>
+                {remotePeers.slice(0, 3).map((peer) => (
+                  <span
+                    key={peer.clientId}
+                    title={`${peer.name} (${peer.xPercent}%, ${peer.yPercent}%)`}
+                    style={{ backgroundColor: peer.color }}
+                    className="w-4 h-4 rounded-full text-[9px] font-bold text-black flex items-center justify-center ring-1 ring-black"
+                  >
+                    {peer.name.charAt(0)}
+                  </span>
+                ))}
+              </div>
+              <button
+                type="button"
+                data-testid="spawn-collab-peer-btn"
+                onClick={handleSpawnCollaboratorCursor}
+                title="Simulate/connect an additional real-time developer viewing this shareable artifact URL"
+                className="ml-1 px-1.5 py-0.5 rounded-md bg-indigo-500/25 hover:bg-indigo-500/40 text-[10px] font-mono font-bold text-indigo-200 transition-colors cursor-pointer"
+              >
+                + Peer
+              </button>
+            </div>
+
+            {/* Run Tests (Jest-like Suite) Button */}
+            <button
+              type="button"
+              data-testid="run-tests-btn"
+              onClick={handleRunTestsSuite}
+              title="Run a Jest-like unit & DOM assertion suite against the generated HTML, CSS, and JS code and display results in the Console Panel"
+              className={`text-xs flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border transition-colors cursor-pointer ${
+                lastTestSuiteResult
+                  ? lastTestSuiteResult.allPassed
+                    ? 'bg-emerald-500/20 text-emerald-200 border-emerald-500/40'
+                    : 'bg-amber-500/20 text-amber-200 border-amber-500/40'
+                  : 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-200 border-emerald-500/30'
+              }`}
+            >
+              <FlaskConical className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Run Tests</span>
+              {lastTestSuiteResult && (
+                <span
+                  data-testid="run-tests-badge"
+                  className="px-1.5 py-0.2 rounded bg-black/40 text-[10px] font-mono font-bold"
+                >
+                  {lastTestSuiteResult.passedCount}/{lastTestSuiteResult.totalCount}
+                </span>
+              )}
+            </button>
+
+            {/* 1-Click Deploy to Vercel Button */}
+            <button
+              type="button"
+              data-testid="deploy-vercel-btn"
+              onClick={() => handleDeployToVercel()}
+              disabled={isDeployingVercel}
+              title="Deploy the current project structure (HTML, CSS, JS, vercel.json) as a standalone site via the Vercel v13 API"
+              className="text-xs flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white text-black hover:bg-zinc-200 font-bold border border-white/80 shadow-md transition-all cursor-pointer disabled:opacity-60"
+            >
+              <span className="text-[11px] leading-none">▲</span>
+              <span>{isDeployingVercel ? 'Deploying...' : 'Deploy to Vercel'}</span>
+            </button>
 
             <button
               type="button"
@@ -1059,6 +1574,31 @@ export default function ArtifactSandbox({
                 <>
                   <FolderArchive className="w-3.5 h-3.5 text-teal-400" />
                   <span>Export Project</span>
+                </>
+              )}
+            </button>
+
+            <button
+              type="button"
+              data-testid="toolbar-prettier-format-btn"
+              onClick={handleFormatCode}
+              disabled={isFormattingPrettier}
+              title="Run Worker-Based Prettier Formatter on HTML, CSS, and JS"
+              className={`text-xs flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border transition-colors cursor-pointer ${
+                formatSuccess
+                  ? 'bg-emerald-500/20 text-emerald-200 border-emerald-500/40'
+                  : 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-200 border-emerald-500/30'
+              }`}
+            >
+              {formatSuccess ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Prettier Formatted!</span>
+                </>
+              ) : (
+                <>
+                  <Code2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>{isFormattingPrettier ? 'Formatting...' : 'Format Code'}</span>
                 </>
               )}
             </button>
@@ -1182,8 +1722,29 @@ export default function ArtifactSandbox({
               <span>Deps ({activeDependencies.length})</span>
             </button>
             <button
+              type="button"
+              data-testid="toggle-saved-snippets-drawer-btn"
+              onClick={() => {
+                setShowSavedSnippetsDrawer(!showSavedSnippetsDrawer);
+                setShowHistoryDrawer(false);
+                setShowDependenciesDrawer(false);
+                setShowParamsDrawer(false);
+                setShowSeoDrawer(false);
+              }}
+              title="Open Saved Snippets list to load saved artifacts or export all saved snippets as a single ZIP file"
+              className={`text-xs flex items-center gap-1 px-2.5 py-1.5 rounded-xl border transition-colors cursor-pointer ${
+                showSavedSnippetsDrawer
+                  ? 'bg-teal-500/15 text-teal-300 border-teal-500/30'
+                  : 'bg-white/[0.04] hover:bg-white/[0.08] text-zinc-300 border-white/[0.08]'
+              }`}
+            >
+              <Save className="w-3.5 h-3.5 text-teal-400" />
+              <span>Saved Snippets ({savedSnippets.length})</span>
+            </button>
+            <button
               onClick={() => {
                 setShowHistoryDrawer(!showHistoryDrawer);
+                setShowSavedSnippetsDrawer(false);
                 setShowDependenciesDrawer(false);
                 setShowParamsDrawer(false);
                 setShowSeoDrawer(false);
@@ -1198,11 +1759,14 @@ export default function ArtifactSandbox({
               <span>History ({versionHistory.length})</span>
             </button>
             <button
+              type="button"
+              data-testid="open-github-push-btn"
               onClick={() => setIsGitModalOpen(true)}
-              className="text-xs flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-zinc-300 border border-white/[0.08] transition-colors cursor-pointer"
+              title="Connect GitHub via OAuth and push your current code state to a GitHub repository"
+              className="text-xs flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-200 border border-indigo-500/30 transition-colors cursor-pointer"
             >
               <GitBranch className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Git</span>
+              <span>GitHub Push</span>
             </button>
           </div>
         </div>
@@ -1503,6 +2067,114 @@ export default function ArtifactSandbox({
         </div>
       )}
 
+      {showSavedSnippetsDrawer && (
+        <div
+          data-testid="saved-snippets-drawer"
+          className="p-4 border-b border-white/[0.08] bg-zinc-900/95 backdrop-blur-xl max-h-72 overflow-y-auto space-y-3"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                <Save className="w-3.5 h-3.5 text-teal-400" />
+                <span>Saved Snippets List ({savedSnippets.length})</span>
+              </span>
+              <span className="text-[11px] text-zinc-400">
+                Export all saved artifacts as a single ZIP containing separate HTML, CSS, and JS files
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                data-testid="download-all-snippets-btn"
+                onClick={handleDownloadAllSavedSnippetsZip}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border transition-colors cursor-pointer ${
+                  allSnippetsZipped
+                    ? 'bg-emerald-500/20 text-emerald-200 border-emerald-500/40'
+                    : 'bg-teal-500/20 hover:bg-teal-500/30 text-teal-200 border-teal-500/40'
+                }`}
+              >
+                {allSnippetsZipped ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Downloaded All (.ZIP)!</span>
+                  </>
+                ) : (
+                  <>
+                    <FolderArchive className="w-3.5 h-3.5 text-teal-400" />
+                    <span>Download All ({savedSnippets.length} Snippets .ZIP)</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowSavedSnippetsDrawer(false)}
+                className="text-xs text-zinc-400 hover:text-white px-2.5 py-1 rounded-lg bg-white/[0.06] cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Save Current Artifact Row */}
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={snippetTitleInput}
+              onChange={(e) => setSnippetTitleInput(e.target.value)}
+              placeholder="Name current artifact to add to Saved Snippets..."
+              className="flex-1 bg-black/60 border border-white/[0.1] rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-teal-500"
+            />
+            <button
+              type="button"
+              onClick={handleConfirmSaveSnippet}
+              className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1 cursor-pointer shrink-0"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Save Current Snippet</span>
+            </button>
+          </div>
+
+          {/* Saved Snippets Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {savedSnippets.map((snippet) => (
+              <div
+                key={snippet.id}
+                data-testid={`saved-snippet-item-${snippet.id}`}
+                className="flex items-center justify-between p-2.5 rounded-xl bg-black/50 border border-white/[0.08] hover:border-teal-500/40"
+              >
+                <div className="min-w-0 pr-2">
+                  <div className="text-xs font-semibold text-zinc-100 truncate">
+                    {snippet.title}
+                  </div>
+                  <div className="text-[10px] font-mono text-zinc-400">
+                    index.html + styles.css + app.js · {new Date(snippet.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => onLoadSnippet(snippet)}
+                    className="px-2.5 py-1 rounded-lg bg-teal-500/15 hover:bg-teal-500/25 text-teal-300 border border-teal-500/30 text-xs font-semibold cursor-pointer"
+                  >
+                    Load
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onDeleteSnippet(snippet.id)}
+                    aria-label={`Delete ${snippet.title}`}
+                    className="p-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/25 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Main Workspace Area: Preview-First Default, Code Editor, or Split Studio */}
       <div className="flex-1 flex flex-col xl:flex-row overflow-hidden">
         {/* CODE PANE (Only shown when user switches to '💻 Code Editor' or '⚡ Split Studio') */}
@@ -1567,11 +2239,14 @@ export default function ArtifactSandbox({
               </div>
 
               <div className="flex items-center gap-1.5">
-                {/* Format Code Button */}
+                {/* Format Code Button (Prettier Web Worker) */}
                 <button
+                  type="button"
+                  data-testid="prettier-format-code-btn"
                   onClick={handleFormatCode}
-                  title="Format & Clean Up Artifact Code (Prettier Engine)"
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 transition-all cursor-pointer"
+                  disabled={isFormattingPrettier}
+                  title="Format & Clean Up HTML, CSS, and JS in Background Prettier Web Worker"
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 transition-all cursor-pointer disabled:opacity-60"
                 >
                   {formatSuccess ? (
                     <>
@@ -1581,7 +2256,7 @@ export default function ArtifactSandbox({
                   ) : (
                     <>
                       <Code2 className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Format Code</span>
+                      <span>{isFormattingPrettier ? 'Formatting...' : 'Format Code'}</span>
                     </>
                   )}
                 </button>
@@ -1777,8 +2452,132 @@ export default function ArtifactSandbox({
                   <span>Social Share</span>
                 </button>
 
+                {/* Viral "Built with DevPulse AI" Watermark Toggle */}
                 <button
                   type="button"
+                  role="switch"
+                  aria-checked={includeViralBadge}
+                  data-testid="viral-badge-toggle"
+                  onClick={() => setIncludeViralBadge((prev) => !prev)}
+                  title="When enabled, Download .HTML and Share URL automatically inject a floating 'Built Free on DevPulse AI' pill linking back to this workspace"
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+                    includeViralBadge
+                      ? 'bg-indigo-500/20 text-indigo-200 border-indigo-500/45'
+                      : 'bg-white/[0.04] text-zinc-400 border-white/[0.1]'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                  <span className="hidden sm:inline">Include Viral Badge</span>
+                  <span
+                    className={`px-1.5 py-0.2 rounded text-[10px] font-mono font-bold ${
+                      includeViralBadge ? 'bg-emerald-500/25 text-emerald-300' : 'bg-zinc-800 text-zinc-400'
+                    }`}
+                  >
+                    {includeViralBadge ? 'ON' : 'OFF'}
+                  </span>
+                </button>
+
+                {/* 1-Click Export to IDE Dropdown (CodePen, StackBlitz, JSFiddle) */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    data-testid="export-ide-dropdown-btn"
+                    aria-expanded={isIdeExportOpen}
+                    onClick={() => setIsIdeExportOpen((prev) => !prev)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-200 border border-emerald-500/35 transition-colors cursor-pointer"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Export to IDE ▾</span>
+                  </button>
+
+                  {isIdeExportOpen && (
+                    <div
+                      data-testid="export-ide-dropdown-menu"
+                      className="absolute right-0 mt-1.5 w-60 rounded-2xl bg-[#0B0D14]/98 backdrop-blur-2xl border border-white/[0.14] shadow-2xl p-1.5 z-50 space-y-1"
+                    >
+                      <button
+                        type="button"
+                        data-testid="export-ide-codepen-btn"
+                        onClick={() => handleExportToIde('codepen')}
+                        className="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-zinc-200 hover:text-white hover:bg-indigo-500/20 flex items-center justify-between transition-colors cursor-pointer"
+                      >
+                        <span>Open in CodePen</span>
+                        <span className="text-[10px] font-mono text-indigo-300">POST</span>
+                      </button>
+                      <button
+                        type="button"
+                        data-testid="export-ide-stackblitz-btn"
+                        onClick={() => handleExportToIde('stackblitz')}
+                        className="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-zinc-200 hover:text-white hover:bg-indigo-500/20 flex items-center justify-between transition-colors cursor-pointer"
+                      >
+                        <span>Open in StackBlitz</span>
+                        <span className="text-[10px] font-mono text-emerald-300">POST</span>
+                      </button>
+                      <button
+                        type="button"
+                        data-testid="export-ide-jsfiddle-btn"
+                        onClick={() => handleExportToIde('jsfiddle')}
+                        className="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-zinc-200 hover:text-white hover:bg-indigo-500/20 flex items-center justify-between transition-colors cursor-pointer"
+                      >
+                        <span>Open in JSFiddle</span>
+                        <span className="text-[10px] font-mono text-amber-300">POST</span>
+                      </button>
+
+                      <div className="my-1 border-t border-white/[0.08]" />
+
+                      <button
+                        type="button"
+                        data-testid="export-dropdown-connect-github-btn"
+                        onClick={() => {
+                          setIsIdeExportOpen(false);
+                          setGitModalInitialTarget('repo');
+                          setIsGitModalOpen(true);
+                        }}
+                        className="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-zinc-100 hover:text-white hover:bg-indigo-500/25 flex items-center justify-between transition-colors cursor-pointer"
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <Github className="w-3.5 h-3.5 text-indigo-400" />
+                          <span>{connectedGitHubUser ? `GitHub (@${connectedGitHubUser.login})` : 'Connect GitHub'}</span>
+                        </span>
+                        <span className="text-[10px] font-mono text-emerald-300">
+                          {connectedGitHubUser ? 'READY' : 'OAUTH'}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        data-testid="export-dropdown-github-gist-btn"
+                        onClick={() => {
+                          setIsIdeExportOpen(false);
+                          setGitModalInitialTarget('gist');
+                          setIsGitModalOpen(true);
+                        }}
+                        className="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-zinc-200 hover:text-white hover:bg-emerald-500/20 flex items-center justify-between transition-colors cursor-pointer"
+                      >
+                        <span>Push to GitHub Gist</span>
+                        <span className="text-[10px] font-mono text-emerald-300">GIST</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        data-testid="export-dropdown-push-github-btn"
+                        onClick={() => {
+                          setIsIdeExportOpen(false);
+                          setGitModalInitialTarget('repo');
+                          setIsGitModalOpen(true);
+                        }}
+                        className="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-zinc-200 hover:text-white hover:bg-indigo-500/20 flex items-center justify-between transition-colors cursor-pointer"
+                      >
+                        <span>Push to GitHub Repo</span>
+                        <span className="text-[10px] font-mono text-indigo-300">REPO</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  data-testid="download-html-btn"
                   onClick={handleDownloadHtml}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/[0.04] hover:bg-white/[0.1] text-zinc-200 border border-white/[0.1] transition-colors cursor-pointer"
                 >
@@ -1787,7 +2586,9 @@ export default function ArtifactSandbox({
                 </button>
 
                 <button
-                  onClick={onShareUrl}
+                  type="button"
+                  data-testid="share-live-url-btn"
+                  onClick={handleShareLiveUrlWithWatermark}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/[0.04] hover:bg-white/[0.1] text-zinc-200 border border-white/[0.1] transition-colors cursor-pointer"
                 >
                   {shareCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
@@ -1976,7 +2777,11 @@ export default function ArtifactSandbox({
 
             {/* Integrated Runtime Console Panel */}
             {showConsolePanel && (
-              <div className="h-52 border-t border-white/[0.1] bg-[#06070B] flex flex-col shrink-0">
+              <div
+                className={`${
+                  lastTestSuiteResult ? 'h-72' : 'h-52'
+                } border-t border-white/[0.1] bg-[#06070B] flex flex-col shrink-0 transition-all`}
+              >
                 <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-1.5 border-b border-white/[0.08] bg-white/[0.02]">
                   <div className="flex flex-wrap items-center gap-2">
                     <Terminal className="w-3.5 h-3.5 text-emerald-400" />
@@ -2050,7 +2855,7 @@ export default function ArtifactSandbox({
                         className="text-[11px] text-white bg-rose-600 hover:bg-rose-500 px-2.5 py-0.5 rounded font-semibold flex items-center gap-1 cursor-pointer"
                       >
                         <Sparkles className="w-3 h-3" />
-                        <span>{isAutoHealing ? 'Healing...' : '✨ 1-Click Auto-Fix with AI'}</span>
+                        <span>{isAutoHealing ? 'Healing...' : '1-Click Auto-Fix with AI'}</span>
                       </button>
                     )}
                     <button
@@ -2068,12 +2873,82 @@ export default function ArtifactSandbox({
                     </button>
                   </div>
                 </div>
-                <div className="flex-1 overflow-y-auto p-2.5 font-mono text-xs space-y-1">
+                <div className="flex-1 overflow-y-auto p-2.5 font-mono text-xs space-y-2">
+                  {/* Jest-Like Test Runner Results Summary Banner inside Console Panel */}
+                  {lastTestSuiteResult && (
+                    <div
+                      data-testid="console-test-suite-summary"
+                      className={`p-3 rounded-xl border space-y-2 ${
+                        lastTestSuiteResult.allPassed
+                          ? 'bg-emerald-950/25 border-emerald-500/35 text-emerald-200'
+                          : 'bg-amber-950/25 border-amber-500/35 text-amber-200'
+                      }`}
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span
+                            data-testid="jest-suite-status-pill"
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                              lastTestSuiteResult.allPassed
+                                ? 'bg-emerald-500 text-black'
+                                : 'bg-rose-500 text-white'
+                            }`}
+                          >
+                            {lastTestSuiteResult.allPassed ? 'PASS' : 'FAIL'}
+                          </span>
+                          <span className="font-bold text-white">{lastTestSuiteResult.suiteName}</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-[11px]">
+                          <span className="text-emerald-400 font-bold">
+                            {lastTestSuiteResult.passedCount} passed
+                          </span>
+                          {lastTestSuiteResult.failedCount > 0 && (
+                            <span className="text-rose-400 font-bold">
+                              {lastTestSuiteResult.failedCount} failed
+                            </span>
+                          )}
+                          <span className="text-zinc-400">
+                            {lastTestSuiteResult.totalCount} total ({lastTestSuiteResult.totalDurationMs} ms)
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5 pt-1">
+                        {lastTestSuiteResult.results.map((tc) => (
+                          <div
+                            key={tc.id}
+                            data-testid="jest-test-case-item"
+                            className={`px-2.5 py-1.5 rounded-lg border flex items-start gap-2 text-[11px] ${
+                              tc.status === 'passed'
+                                ? 'bg-black/40 border-emerald-500/20 text-zinc-200'
+                                : 'bg-rose-950/40 border-rose-500/35 text-rose-200'
+                            }`}
+                          >
+                            <span className="shrink-0 font-bold">
+                              {tc.status === 'passed' ? (
+                                <span className="text-emerald-400">✓</span>
+                              ) : (
+                                <span className="text-rose-400">✕</span>
+                              )}
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <div className="font-medium truncate">{tc.title}</div>
+                              <div className="text-[10px] text-zinc-400 truncate">
+                                {tc.status === 'passed' ? tc.assertionSummary : tc.failureMessage}
+                              </div>
+                            </div>
+                            <span className="text-[10px] text-zinc-500 shrink-0">{tc.durationMs}ms</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {filteredLogs.length === 0 ? (
                     <div className="text-zinc-500 text-xs py-6 text-center" data-testid="console-empty-state">
                       {consoleSearchQuery.trim()
                         ? `No console logs matching "${consoleSearchQuery}". Try clearing your search filter.`
-                        : 'No console output captured yet. Logs (`console.log`, `console.warn`, `console.error`) from your artifact appear here in real time.'}
+                        : 'No console output captured yet. Logs (`console.log`, `console.warn`, `console.error`) and Jest test results appear here in real time.'}
                     </div>
                   ) : (
                     filteredLogs.map((entry) => (
@@ -2587,11 +3462,167 @@ export default function ArtifactSandbox({
         </div>
       )}
 
-      {/* Git Repository Modal */}
+      {/* Real-Time Multi-User Cursor Overlay */}
+      {showRemoteCursors && remotePeers.length > 0 && (
+        <div
+          data-testid="remote-cursor-overlay"
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-30 overflow-hidden"
+        >
+          {remotePeers.map((peer) => (
+            <div
+              key={peer.clientId}
+              data-testid="remote-cursor-pointer"
+              style={{
+                left: `${peer.xPercent}%`,
+                top: `${peer.yPercent}%`,
+                transition: 'left 120ms cubic-bezier(0.22, 1, 0.36, 1), top 120ms cubic-bezier(0.22, 1, 0.36, 1)'
+              }}
+              className="absolute flex flex-col items-start"
+            >
+              <MousePointer2
+                className="w-4 h-4 -rotate-12 drop-shadow-md"
+                style={{ color: peer.color, fill: peer.color }}
+              />
+              <div
+                style={{ backgroundColor: peer.color }}
+                className="mt-0.5 ml-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold text-slate-950 shadow-lg whitespace-nowrap flex items-center gap-1"
+              >
+                <span>{peer.name}</span>
+                <span className="opacity-75 font-mono text-[9px]">
+                  ({peer.xPercent}%, {peer.yPercent}%)
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* 1-Click Deploy to Vercel Modal */}
+      {isVercelModalOpen && vercelDeployResult && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="vercel-deploy-modal-title"
+          data-testid="vercel-deploy-modal"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl"
+        >
+          <div className="w-full max-w-xl rounded-3xl bg-[#08090F] border border-white/[0.15] shadow-2xl p-5 space-y-4">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-white text-black font-black flex items-center justify-center text-sm">
+                  ▲
+                </div>
+                <div>
+                  <h3 id="vercel-deploy-modal-title" className="text-sm font-bold text-white flex items-center gap-2">
+                    <span>Vercel Standalone Deployment Ready</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      {vercelDeployResult.readyState}
+                    </span>
+                  </h3>
+                  <p className="text-[11px] text-zinc-400">
+                    Deployed via Vercel REST API v13 (<code className="font-mono text-zinc-300">POST /v13/deployments</code>)
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                data-testid="close-vercel-modal-btn"
+                onClick={() => setIsVercelModalOpen(false)}
+                className="px-2.5 py-1 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-xs text-zinc-300 hover:text-white cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.08] space-y-2.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-zinc-400">Standalone Site URL:</span>
+                <span className="font-mono text-[11px] text-emerald-400 flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>SSL &amp; Edge Headers Active</span>
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  data-testid="vercel-deployed-url"
+                  value={
+                    vercelDeployResult.vercelAliasUrl ||
+                    `${typeof window !== 'undefined' ? window.location.origin : ''}${vercelDeployResult.url}`
+                  }
+                  className="flex-1 bg-black/60 border border-white/[0.12] rounded-xl px-3 py-2 text-xs font-mono text-indigo-300 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  data-testid="copy-vercel-url-btn"
+                  onClick={() => {
+                    const targetUrl =
+                      vercelDeployResult.vercelAliasUrl ||
+                      `${typeof window !== 'undefined' ? window.location.origin : ''}${vercelDeployResult.url}`;
+                    navigator.clipboard?.writeText(targetUrl)?.catch(() => {});
+                    setVercelDeployCopied(true);
+                    setTimeout(() => setVercelDeployCopied(false), 2000);
+                  }}
+                  className="px-3 py-2 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-xs font-semibold text-white cursor-pointer"
+                >
+                  {vercelDeployCopied ? 'Copied!' : 'Copy URL'}
+                </button>
+                <a
+                  href={vercelDeployResult.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid="open-vercel-preview-link"
+                  className="px-3.5 py-2 rounded-xl bg-white text-black hover:bg-zinc-200 text-xs font-bold flex items-center gap-1"
+                >
+                  <span>Visit Site</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] font-mono text-zinc-400">
+                <span>Deployment ID: {vercelDeployResult.id}</span>
+                <span>•</span>
+                <span>Files: {vercelDeployResult.filesDeployed.join(', ')}</span>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-indigo-500/[0.05] border border-indigo-500/20 space-y-2">
+              <label className="block text-[11px] font-semibold text-indigo-200">
+                Optional: Deploy with Personal Vercel API Token (<code className="font-mono">VERCEL_API_TOKEN</code>)
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="password"
+                  data-testid="vercel-token-input"
+                  value={vercelTokenInput}
+                  onChange={(e) => setVercelTokenInput(e.target.value)}
+                  placeholder="Paste Vercel Bearer Token to push to your personal Vercel team..."
+                  className="flex-1 bg-black/60 border border-white/[0.12] rounded-xl px-3 py-1.5 text-xs text-white placeholder-zinc-500 focus:border-indigo-500 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleDeployToVercel(vercelTokenInput)}
+                  disabled={!vercelTokenInput.trim() || isDeployingVercel}
+                  className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-xs font-bold text-white cursor-pointer"
+                >
+                  Re-Deploy
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Git Repository & Gist Export Modal */}
       <GitRepoModal
         isOpen={isGitModalOpen}
         onClose={() => setIsGitModalOpen(false)}
         codeState={codeState}
+        initialTargetType={gitModalInitialTarget}
+        onOAuthConnected={(user) => setConnectedGitHubUser(user)}
       />
     </div>
   );

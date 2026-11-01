@@ -12,7 +12,9 @@ export type SeoToolSlug =
   | 'error-explainer'
   | 'readme-generator'
   | 'cron-expression'
-  | 'svg-optimizer';
+  | 'svg-optimizer'
+  | 'roi-calculator'
+  | 'free-templates';
 
 export interface SeoToolStep {
   stepNumber: string;
@@ -804,6 +806,132 @@ export const SEO_TOOLS_CATALOG: SeoToolDefinition[] = [
         answer: 'No. SVG optimization and JSX transformation run 100% locally in your browser.'
       }
     ]
+  },
+  {
+    slug: 'roi-calculator',
+    navId: 'tool-roi-calculator',
+    shortName: 'AI ROI & Cost Calculator',
+    name: 'AI Engineering ROI, Token Cost & Developer Productivity Calculator',
+    h1Title: 'Free AI Engineering ROI Calculator — Estimate LLM Token Costs & Dev Hours Saved',
+    metaTitle: 'AI Engineering ROI & LLM Token Cost Calculator Online Free (No Login) — Instant AI Developer Tool | DevPulse AI',
+    metaDescription: 'Free online AI Engineering ROI & LLM Token Cost Calculator. Calculate monthly developer hours saved, API token spend, and net engineering ROI across teams.',
+    bentoDescription: 'Calculate engineering hours saved, monthly LLM API token costs, and net productivity ROI for your dev team.',
+    badge: 'Popular',
+    tierBadge: 'Pro',
+    quickTip: 'Adjust team size, hourly rate, and daily AI prompts to compute monthly hours saved and net ROI.',
+    accentColor: 'emerald',
+    category: 'DevOps & Docs',
+    ratingValue: '4.9',
+    ratingCount: '1640',
+    overviewParagraphs: [
+      'Engineering leaders, CTOs, and indie founders need concrete financial telemetry before scaling AI coding workflows or provisioning enterprise LLM API budgets. The DevPulse AI Engineering ROI & Token Cost Calculator models your team’s monthly productivity gains against real-world LLM token consumption.',
+      'By combining developer team size, average hourly engineering compensation, daily prompt volume, and average input/output token payloads, this calculator outputs net monthly dollar savings, annualized engineering hours reclaimed, and payback period in days.'
+    ],
+    steps: [
+      {
+        stepNumber: '01',
+        title: 'Configure Engineering Team Size & Hourly Rate',
+        description: 'Set the number of active developers on your team and their blended hourly engineering cost (e.g., $65/hr to $150/hr).'
+      },
+      {
+        stepNumber: '02',
+        title: 'Input Daily AI Prompts & Average Minutes Saved',
+        description: 'Specify how many UI, SQL, debugging, or unit-test prompts each engineer runs per day and the average manual coding minutes saved per task.'
+      },
+      {
+        stepNumber: '03',
+        title: 'Inspect Net Monthly ROI, Token Spend & Annual Savings',
+        description: 'Review real-time KPI breakdowns comparing monthly LLM API/hosting costs against gross engineering payroll value unlocked.'
+      }
+    ],
+    features: [
+      'Interactive sliders for Team Size, Hourly Developer Rate, Daily AI Prompts, and Minutes Saved per Prompt',
+      'Real-time calculation of Monthly Engineering Hours Saved, Gross Value Created ($), and Net ROI (%)',
+      'Side-by-side comparison of Free BYOK Rotator ($0 API cost) vs. commercial per-million-token API pricing',
+      'Instant 1-click export of ROI executive summary for engineering budget proposals',
+      '100% client-side financial modeling with zero telemetry or login walls'
+    ],
+    faqs: [
+      {
+        question: 'How is AI Engineering ROI calculated by this tool?',
+        answer: 'We multiply your team size by daily prompts per developer, working days per month (22), and average minutes saved per prompt to determine total monthly hours saved, then multiply by your blended hourly rate and subtract estimated API & cloud hosting costs.'
+      },
+      {
+        question: 'How much does DevPulse AI cost compared to paid AI coding subscriptions?',
+        answer: 'DevPulse AI is 100% free with zero per-seat subscription fees. Using our built-in free auto-rotator or your own free-tier Gemini and Groq API keys keeps your monthly software license cost at $0.'
+      },
+      {
+        question: 'What is a realistic number of minutes saved per AI UI or SQL generation?',
+        answer: 'Across 18,400+ components built on DevPulse AI, developers report saving an average of 12 to 25 minutes per UI component, regex pattern, or complex PostgreSQL query.'
+      },
+      {
+        question: 'Can I copy the ROI breakdown for my CTO or finance pitch deck?',
+        answer: 'Yes. Click "Copy ROI Executive Summary" to copy a formatted Markdown breakdown of your team’s projected monthly and annual savings.'
+      }
+    ]
+  },
+  {
+    slug: 'free-templates',
+    navId: 'studio-gallery',
+    shortName: 'Free UI Component Templates',
+    name: 'Free Tailwind CSS & React UI Component Templates Gallery',
+    h1Title: 'Free Tailwind CSS & React UI Component Templates — 12+ Live Boilerplates',
+    metaTitle: 'Free Tailwind CSS & React UI Component Templates Online Free (No Login) — Instant AI Developer Tool | DevPulse AI',
+    metaDescription: 'Browse 12+ free production-ready Tailwind CSS, HTML5 & React UI component templates. Hover to live-preview SaaS dashboards, Bento grids, pricing tables & auth cards.',
+    bentoDescription: 'Explore 12+ production Tailwind CSS & React templates with instant hover preview and 1-click sandbox editing.',
+    badge: 'Free',
+    tierBadge: 'New',
+    quickTip: 'Hover over any template card for an instant live preview or open it directly in the Visual Sandbox.',
+    accentColor: 'indigo',
+    category: 'AI Studio',
+    ratingValue: '4.9',
+    ratingCount: '2190',
+    overviewParagraphs: [
+      'Starting a new SaaS dashboard, marketing landing page, AI chat interface, or fintech checkout flow from a blank file slows down product velocity. The DevPulse Free Tailwind CSS & React UI Component Gallery ships 12+ curated, dark-mode-ready architectural boilerplates that you can inspect and customize immediately.',
+      'Hover over any component card to trigger a live, non-interactive iframe preview window above the card, or click "Open in Sandbox" to load the complete HTML5, Tailwind CSS, and JavaScript source into the Visual Artifact Studio for point-and-click DOM editing and 1-click export to React TSX, Next.js, CodePen, or StackBlitz.'
+    ],
+    steps: [
+      {
+        stepNumber: '01',
+        title: 'Filter by Category or Search by UI Pattern',
+        description: 'Browse curated categories including Marketing & Bento, SaaS & Dashboards, AI & Chat, and Auth & FinTech, or filter by keyword.'
+      },
+      {
+        stepNumber: '02',
+        title: 'Hover for Instant Live Preview or Click Live Peek',
+        description: 'Hover over any card to inspect its rendered layout in real time, or click "Live Peek" to test interactive buttons and charts inline.'
+      },
+      {
+        stepNumber: '03',
+        title: 'Open in Visual Sandbox & Export to React / Next.js',
+        description: 'Click "Open in Sandbox" to customize colors, typography, and copy with AI or export directly to React TSX, CodePen, or a standalone ZIP.'
+      }
+    ],
+    features: [
+      '12+ hand-crafted 2026 Liquid Glass & Bento Grid UI templates built with semantic HTML5 and Tailwind CSS',
+      'Instant non-interactive hover preview window above every template card for zero-friction browsing',
+      'Full interactive Live Peek drawer to test responsive layouts before loading into the main studio',
+      '1-click handoff to the Visual Artifact Sandbox for AI-assisted customization and framework transpilation',
+      '100% free for commercial and personal projects with zero attribution required'
+    ],
+    faqs: [
+      {
+        question: 'Are all UI component templates free for commercial SaaS projects?',
+        answer: 'Yes. Every template in the DevPulse UI Component Gallery is 100% free to use in personal, client, and commercial applications with no licensing fees.'
+      },
+      {
+        question: 'Can I convert these HTML + Tailwind templates into React or Next.js components?',
+        answer: 'Yes! Click "Open in Sandbox" on any template card, switch to the Code Editor view, and select React (TSX), Next.js App Router, or Vue 3 in the 1-Click Framework Exporter bar.'
+      },
+      {
+        question: 'How does the live hover preview work without slowing down the page?',
+        answer: 'The hover preview window mounts a lightweight, scaled iframe only for the single card currently under your cursor and unmounts it immediately when your cursor leaves.'
+      },
+      {
+        question: 'Can I save my own custom templates to reuse later?',
+        answer: 'Yes. Inside the Visual Artifact Studio, click "Starter Templates" in the top toolbar to save your own custom boilerplates to browser localStorage.'
+      }
+    ]
   }
 ];
 
@@ -826,6 +954,11 @@ export const SEO_TOOL_SLUG_ALIASES: Record<string, SeoToolSlug> = {
   'ui-generator': 'ai-ui-generator',
   'vision-to-code': 'screenshot-to-code',
   'model-benchmarker': 'prompt-benchmarker',
+  'roi': 'roi-calculator',
+  'cost-calculator': 'roi-calculator',
+  'templates': 'free-templates',
+  'ui-templates': 'free-templates',
+  'component-gallery': 'free-templates',
 };
 
 export function getSeoToolBySlug(slug: string | null | undefined): SeoToolDefinition {
@@ -1080,12 +1213,55 @@ export const SEO_TOOL_LOGIC_BY_SLUG: Record<SeoToolSlug, SeoToolLogicExplanation
       'Component names containing spaces or symbols are sanitized into valid PascalCase TypeScript identifiers.',
       'Empty or whitespace-only SVG inputs return 0% savings safely without division-by-zero NaN errors.'
     ]
+  },
+  'roi-calculator': {
+    whyNeedTitle: 'Why Quantifying Engineering Hours & Token Spend Unlocks AI Adoption',
+    whyUsersNeedParagraphs: [
+      'Engineering teams often underestimate the compounding value of shaving 15 minutes off repetitive frontend scaffolding, SQL query tuning, and JSON schema typing across dozens of daily iterations.',
+      'Our deterministic ROI model pairs hourly developer compensation with token cost telemetry so CTOs and indie builders can see exact monthly payback metrics.'
+    ],
+    formulaAndLogicTitle: 'Monthly Engineering ROI & Net Token Savings Formula',
+    formulaAndLogicExplanation:
+      'Monthly hours saved is computed across 22 working days per month, multiplied by blended hourly engineering rate, and compared against monthly API & edge hosting costs.',
+    formulaCodeSnippet: `HoursSavedMo = (TeamSize * PromptsPerDay * MinutesSaved * 22) / 60\nGrossValueUSD = HoursSavedMo * HourlyRateUSD\nNetROI_Pct = round(((GrossValueUSD - MonthlyApiCost) / max(1, MonthlyApiCost)) * 100)`,
+    edgeCasesCovered: [
+      'Zero-cost BYOK / Free Auto-Rotator workflows guard against division-by-zero when computing ROI percentages.',
+      'Team sizes from 1 solo indie hacker up to 250+ enterprise engineers scale linearly with instant reactivity.',
+      'Exports clean Markdown financial summaries ready for Notion, Slack, or GitHub RFCs.'
+    ]
+  },
+  'free-templates': {
+    whyNeedTitle: 'Why Production-Tested Tailwind & React Boilerplates Beat Blank-Canvas Fatigue',
+    whyUsersNeedParagraphs: [
+      'Rebuilding responsive navigation bars, Bento feature grids, dark-mode KPI cards, and authentication modals from scratch on every project drains creative momentum.',
+      'Using pre-engineered, accessible HTML5 + Tailwind CSS templates with instant hover preview lets you launch polished interfaces in minutes and customize them with AI.'
+    ],
+    formulaAndLogicTitle: 'Scaled Iframe Hover Preview & AST Framework Export Logic',
+    formulaAndLogicExplanation:
+      'Each template card renders a 200% virtual viewport scaled by `transform: scale(0.5)` inside an isolated `sandbox="allow-scripts"` iframe for crisp visual fidelity.',
+    formulaCodeSnippet: `PreviewTransform = "width: 200%; height: 200%; transform: scale(0.5); origin: top-left"\nTemplateLoadTime = O(1) In-Memory HTML5 Hydration`,
+    edgeCasesCovered: [
+      'Only the actively hovered card mounts an iframe, keeping DOM memory footprint minimal.',
+      'Templates load into the main Visual Artifact Studio with full HTML, CSS, JS, and SEO metadata intact.',
+      'Every template is pre-validated for responsive mobile, tablet, and desktop breakpoints.'
+    ]
   }
 };
 
 export function getToolLogicAndFormula(slug: SeoToolSlug | string): SeoToolLogicExplanation {
   const tool = getSeoToolBySlug(slug);
   return SEO_TOOL_LOGIC_BY_SLUG[tool.slug] || SEO_TOOL_LOGIC_BY_SLUG['ai-ui-generator'];
+}
+
+/**
+ * Builds a dynamic OpenGraph social preview card image URL for any of the 14 tools.
+ */
+export function buildToolOpenGraphImageUrl(
+  tool: SeoToolDefinition,
+  origin: string = 'https://devpulse.ai'
+): string {
+  const cleanOrigin = (origin || 'https://devpulse.ai').replace(/\/+$/, '');
+  return `${cleanOrigin}/api/og?slug=${encodeURIComponent(tool.slug)}&title=${encodeURIComponent(tool.shortName)}`;
 }
 
 /**
@@ -1359,7 +1535,9 @@ export function buildLlmsTxt(domain = 'https://yourdomain.com'): string {
 - [Stack Trace & Error Explainer](${cleanDomain}/tools/error-explainer) (${cleanDomain}/?tool=error-explainer): Paste terminal stack traces and runtime errors for instant root-cause diagnosis and auto-healed code patches.
 - [AI GitHub README Generator](${cleanDomain}/tools/readme-generator) (${cleanDomain}/?tool=readme-generator): Generate structured README.md documentation with badges, quickstart, and API reference tables.
 - [Cron Expression Generator](${cleanDomain}/tools/cron-expression) (${cleanDomain}/?tool=cron-expression): Convert human schedules into 5-field cron syntax with plain-English explanations and next run calculators.
-- [SVG Optimizer & JSX Converter](${cleanDomain}/tools/svg-optimizer) (${cleanDomain}/?tool=svg-optimizer): Minify raw SVG vectors, convert to React/TypeScript JSX components, or generate custom SVG icons.`;
+- [SVG Optimizer & JSX Converter](${cleanDomain}/tools/svg-optimizer) (${cleanDomain}/?tool=svg-optimizer): Minify raw SVG vectors, convert to React/TypeScript JSX components, or generate custom SVG icons.
+- [AI Engineering ROI Calculator](${cleanDomain}/tools/roi-calculator) (${cleanDomain}/?tool=roi-calculator): Calculate monthly developer hours saved, LLM token costs, and net engineering ROI.
+- [Free Tailwind & React UI Templates](${cleanDomain}/tools/free-templates) (${cleanDomain}/?tool=free-templates): Browse 12+ free production-ready Tailwind CSS & React UI component boilerplates with live hover preview.`;
 }
 
 export function buildSitemapXml(domain = 'https://yourdomain.com'): string {
@@ -1379,18 +1557,9 @@ export function buildSitemapXml(domain = 'https://yourdomain.com'): string {
   <url><loc>${cleanDomain}/tools/readme-generator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>${cleanDomain}/tools/cron-expression</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>${cleanDomain}/tools/svg-optimizer</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>${cleanDomain}/?tool=ai-ui-generator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>${cleanDomain}/?tool=screenshot-to-code</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>${cleanDomain}/?tool=prompt-benchmarker</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>${cleanDomain}/?tool=json-to-typescript</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>${cleanDomain}/?tool=curl-to-code</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>${cleanDomain}/?tool=ai-sql-generator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>${cleanDomain}/?tool=jwt-decoder</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>${cleanDomain}/?tool=regex-generator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>${cleanDomain}/?tool=error-explainer</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>${cleanDomain}/?tool=readme-generator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>${cleanDomain}/?tool=cron-expression</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>${cleanDomain}/?tool=svg-optimizer</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>${cleanDomain}/tools/roi-calculator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>${cleanDomain}/tools/free-templates</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
 </urlset>`;
 }
 

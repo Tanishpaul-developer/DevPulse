@@ -18,12 +18,17 @@ import CoffeeModal from './components/CoffeeModal';
 import ShortcutsModal from './components/ShortcutsModal';
 import SponsorModal from './components/SponsorModal';
 import CryptoDonateModal from './components/CryptoDonateModal';
+import SupportModal from './components/SupportModal';
+import SandboxErrorBoundary from './components/SandboxErrorBoundary';
+import FeedbackModal from './components/FeedbackModal';
+import UsageHistoryView from './components/UsageHistoryView';
 import SEOHead from './components/SEOHead';
 import SemanticSeoArticle from './components/SemanticSeoArticle';
 import SeoIndexNowModal from './components/SeoIndexNowModal';
 import BentoCommandModal from './components/BentoCommandModal';
 import MobileBottomDock from './components/MobileBottomDock';
 import { initAnalyticsAndHeatmaps, trackConversionEvent } from './config/analytics';
+import { getContextualAffiliateForTool } from './config/monetization';
 import {
   ModelId,
   ArtifactCodeState,
@@ -42,7 +47,8 @@ import {
   AUTOSAVE_INTERVAL_MS,
   loadCryptoDonationState,
   recordCryptoDonationAction,
-  CryptoDonationTransaction
+  CryptoDonationTransaction,
+  DEFAULT_SAVED_SNIPPETS
 } from './utils/studioEngine';
 import {
   loadByokConfig,
@@ -72,7 +78,9 @@ import {
   Megaphone,
   Zap,
   CheckCircle2,
-  X
+  X,
+  ArrowUpRight,
+  Coffee
 } from 'lucide-react';
 
 const SNIPPETS_STORAGE_KEY = 'devpulse_saved_snippets_v1';
@@ -141,6 +149,9 @@ export default function App() {
   const [isSeoHubOpen, setIsSeoHubOpen] = useState(false);
   const [isSponsorOpen, setIsSponsorOpen] = useState(false);
   const [isCryptoDonateOpen, setIsCryptoDonateOpen] = useState(false);
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
+  const [supportModalInitialTab, setSupportModalInitialTab] = useState<'chai' | 'crypto'>('chai');
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
   // Crypto Donation Monthly Goal, Transaction History & Thank You Toast State
   const [cryptoDonationState, setCryptoDonationState] = useState(() => loadCryptoDonationState());
@@ -222,15 +233,20 @@ export default function App() {
 
   const [shareCopied, setShareCopied] = useState(false);
 
-  // Saved Snippets in localStorage
+  // Saved Snippets in localStorage (seeded with DEFAULT_SAVED_SNIPPETS on first load)
   const [savedSnippets, setSavedSnippets] = useState<SavedSnippet[]>(() => {
     try {
       const raw = localStorage.getItem(SNIPPETS_STORAGE_KEY);
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
     } catch {
       // ignore
     }
-    return [];
+    return DEFAULT_SAVED_SNIPPETS;
   });
 
   // Keep recentToolSlugs synced and persisted in localStorage whenever activeSeoSlug changes
@@ -577,10 +593,21 @@ export default function App() {
     return getSeoToolByNavId(activeNav);
   }, [activeSeoSlug, activeNav]);
 
+  // Contextual affiliate offer dynamically matched to the active tool route
+  const contextualAffiliate = useMemo(
+    () => getContextualAffiliateForTool(activeSeoTool.slug),
+    [activeSeoTool.slug]
+  );
+
+  const handleResetWorkspaceOnCrash = useCallback(() => {
+    setCodeState(DEFAULT_STARTER_ARTIFACT);
+    persistArtifactAutoSave(DEFAULT_STARTER_ARTIFACT);
+  }, []);
+
   return (
     <div
       data-testid="app-root-container"
-      className="min-h-screen flex flex-col bg-[#06070B] text-zinc-100 selection:bg-indigo-500/30 pb-28 md:pb-0 relative overflow-x-hidden"
+      className="min-h-screen flex flex-col bg-[#06070B] text-zinc-100 selection:bg-indigo-500/30 pb-32 md:pb-0 relative overflow-x-hidden"
     >
       {/* Dynamic Google & Bing SEO Head + JSON-LD Schema Injector */}
       <SEOHead tool={activeSeoTool} />
@@ -599,15 +626,21 @@ export default function App() {
           setByokAlertReason(undefined);
           setIsByokOpen(true);
         }}
-        onOpenCoffeeModal={() => setIsCoffeeOpen(true)}
+        onOpenCoffeeModal={() => {
+          setSupportModalInitialTab('chai');
+          setIsSupportModalOpen(true);
+        }}
         onOpenCryptoModal={() => {
           trackConversionEvent('crypto_donate_modal_open', { zone: 'top_header' });
-          setIsCryptoDonateOpen(true);
+          setSupportModalInitialTab('crypto');
+          setIsSupportModalOpen(true);
         }}
         onOpenShortcutsModal={() => setIsShortcutsOpen(true)}
         onOpenAiChatModal={() => handleNavigateToNavId('labs-prompt-optimizer')}
         onOpenBentoModal={() => setIsBentoModalOpen(true)}
         onOpenSeoHubModal={() => setIsSeoHubOpen(true)}
+        onOpenFeedbackModal={() => setIsFeedbackOpen(true)}
+        onOpenUsageHistory={() => handleNavigateToNavId('labs-usage-history')}
         remainingQuota={remainingQuota}
         hasCustomKey={hasCustomKey}
         theme={theme}
@@ -624,7 +657,7 @@ export default function App() {
           onOpenCommandModal={() => setIsBentoModalOpen(true)}
         />
 
-        <main data-testid="main-workspace-container" className="flex-1 min-w-0 flex flex-col pb-28 md:pb-0">
+        <main data-testid="main-workspace-container" className="flex-1 min-w-0 flex flex-col pb-32 md:pb-0">
           {/* Collapsible 2026 Liquid Glass Bento Grid Hero / 12-Tool Switcher Strip */}
           <section
             aria-label="12-Tool Liquid Glass Bento Switcher"
@@ -676,21 +709,59 @@ export default function App() {
                     data-testid="midpage-donate-crypto-btn"
                     onClick={() => {
                       trackConversionEvent('crypto_donate_modal_open', { zone: 'midpage_bar' });
-                      setIsCryptoDonateOpen(true);
+                      setSupportModalInitialTab('crypto');
+                      setIsSupportModalOpen(true);
                     }}
                     className="text-[11px] font-semibold text-amber-300 hover:text-white px-2.5 py-1 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 flex items-center gap-1 cursor-pointer"
                   >
-                    <Zap className="w-3 h-3 text-amber-400" />
-                    <span>Donate Crypto</span>
+                    <Coffee className="w-3 h-3 text-amber-400" />
+                    <span>Buy Chai / Crypto</span>
                   </button>
                 </div>
+              </div>
+
+              {/* Dynamic Tool-Specific Affiliate Injection Strip */}
+              <div
+                data-testid="contextual-affiliate-bar"
+                className="flex flex-wrap items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-950/50 via-[#0C0F1D] to-emerald-950/40 border border-indigo-500/25"
+              >
+                <div className="flex flex-wrap items-center gap-2 min-w-0">
+                  <span
+                    data-testid="contextual-affiliate-badge"
+                    className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/35 shrink-0"
+                  >
+                    {contextualAffiliate.badge}
+                  </span>
+                  <span
+                    data-testid="contextual-affiliate-headline"
+                    className="text-xs font-semibold text-zinc-200 truncate"
+                  >
+                    {contextualAffiliate.headline}
+                  </span>
+                </div>
+                <a
+                  href={contextualAffiliate.url}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  data-testid="contextual-affiliate-cta"
+                  onClick={() =>
+                    trackConversionEvent('contextual_affiliate_click', {
+                      category: contextualAffiliate.category,
+                      tool: activeSeoTool.slug
+                    })
+                  }
+                  className="text-[11px] font-bold text-emerald-300 hover:text-white px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 flex items-center gap-1 shrink-0 transition-colors"
+                >
+                  <span>{contextualAffiliate.ctaText}</span>
+                  <ArrowUpRight className="w-3 h-3" />
+                </a>
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-indigo-400" />
                   <span className="text-xs font-bold uppercase tracking-wider text-zinc-200">
-                    12 High-Traffic AI &amp; Developer Tools
+                    14 High-Traffic AI &amp; Developer Tools
                   </span>
                   <span
                     data-testid="bento-strip-active-route-pill"
@@ -727,7 +798,7 @@ export default function App() {
 
               {showTopBentoStrip && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-0.5">
-                  {SEO_TOOLS_CATALOG.slice(0, 6).map((tool) => {
+                  {SEO_TOOLS_CATALOG.slice(0, 5).map((tool) => {
                     const isCurrent = tool.slug === activeSeoTool.slug;
                     return (
                       <a
@@ -776,13 +847,41 @@ export default function App() {
                       </a>
                     );
                   })}
+
+                  {/* Permanent Glowing Self-Serve Sponsor Slot Card in Bento Grid */}
+                  <button
+                    type="button"
+                    data-testid="bento-sponsor-slot-card"
+                    onClick={() => {
+                      trackConversionEvent('sponsor_modal_open', { zone: 'bento_grid_slot' });
+                      setIsSponsorOpen(true);
+                    }}
+                    className="group p-2.5 rounded-2xl bg-gradient-to-br from-fuchsia-600/20 via-indigo-600/15 to-emerald-500/10 hover:from-fuchsia-600/30 hover:to-indigo-600/25 border border-fuchsia-500/45 shadow-md shadow-fuchsia-950/40 text-left transition-all flex flex-col justify-between gap-1.5 cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-xs font-bold text-white truncate flex items-center gap-1">
+                        <Megaphone className="w-3 h-3 text-fuchsia-300 shrink-0" />
+                        <span>Sponsor DevPulse AI</span>
+                      </span>
+                      <span className="text-[9px] font-bold uppercase px-1.5 py-0.2 rounded-full bg-fuchsia-500/25 text-fuchsia-200 border border-fuchsia-400/40 shrink-0">
+                        $49/mo
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-fuchsia-100/90 line-clamp-1">
+                      Sponsor DevPulse AI — Reach 50k+ Devs ($49/mo)
+                    </p>
+                  </button>
                 </div>
               )}
             </div>
           </section>
 
-          {/* Interactive Tool Workspace */}
+          {/* Interactive Tool Workspace wrapped in SandboxErrorBoundary */}
           <div className="flex-1">
+            <SandboxErrorBoundary
+              workspaceName={activeSeoTool.shortName}
+              onResetWorkspace={handleResetWorkspaceOnCrash}
+            >
             {activeNav === 'studio-sandbox' && (
               <ArtifactSandbox
                 codeState={codeState}
@@ -848,6 +947,15 @@ export default function App() {
               />
             )}
 
+            {activeNav === 'labs-usage-history' && (
+              <UsageHistoryView
+                onReplayPromptInSandbox={(prompt) => {
+                  setCodeState((prev) => ({ ...prev, prompt }));
+                  handleNavigateToSeoSlug('ai-ui-generator');
+                }}
+              />
+            )}
+
             {activeNav.startsWith('tool-') && (
               <DevUtilities
                 selectedModel={selectedModel}
@@ -857,6 +965,7 @@ export default function App() {
                 onSelectToolId={handleNavigateToNavId}
               />
             )}
+            </SandboxErrorBoundary>
           </div>
 
           {/* Below-the-Fold Semantic SEO Content Block (600+ words, H1/H2, Steps, Formula/Logic, FAQs, Internal Links) */}
@@ -865,6 +974,10 @@ export default function App() {
             onSelectToolSlug={handleNavigateToSeoSlug}
             onOpenSeoHub={() => setIsSeoHubOpen(true)}
             onOpenHosting={() => setIsHostingOpen(true)}
+            onOpenSupportModal={() => {
+              setSupportModalInitialTab('chai');
+              setIsSupportModalOpen(true);
+            }}
             onTriggerDonationToast={() => handleRecordCryptoDonation()}
           />
         </main>
@@ -883,7 +996,7 @@ export default function App() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-xs font-bold text-emerald-300">
-              Thank You for Your Crypto Support!
+              Thank You for Your Support!
             </div>
             <p className="text-xs text-zinc-200 mt-0.5 leading-relaxed">
               {thankYouToastMessage}
@@ -922,6 +1035,7 @@ export default function App() {
         onSelectToolSlug={handleNavigateToSeoSlug}
         onSelectExtraNav={handleNavigateToNavId}
         onOpenHosting={() => setIsHostingOpen(true)}
+        onOpenSponsor={() => setIsSponsorOpen(true)}
       />
 
       <SeoIndexNowModal
@@ -939,6 +1053,14 @@ export default function App() {
 
       <HostingModal isOpen={isHostingOpen} onClose={() => setIsHostingOpen(false)} />
       <CoffeeModal isOpen={isCoffeeOpen} onClose={() => setIsCoffeeOpen(false)} />
+      <SupportModal
+        isOpen={isSupportModalOpen}
+        onClose={() => setIsSupportModalOpen(false)}
+        initialTab={supportModalInitialTab}
+        goalMetrics={cryptoDonationState.goalMetrics}
+        transactions={cryptoDonationState.transactions}
+        onRecordDonation={handleRecordCryptoDonation}
+      />
       <CryptoDonateModal
         isOpen={isCryptoDonateOpen}
         onClose={() => setIsCryptoDonateOpen(false)}
@@ -948,6 +1070,11 @@ export default function App() {
       />
       <ShortcutsModal isOpen={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
       <SponsorModal isOpen={isSponsorOpen} onClose={() => setIsSponsorOpen(false)} />
+      <FeedbackModal
+        isOpen={isFeedbackOpen}
+        onClose={() => setIsFeedbackOpen(false)}
+        activeToolSlug={activeSeoTool.slug}
+      />
     </div>
   );
 }

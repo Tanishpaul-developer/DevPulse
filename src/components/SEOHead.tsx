@@ -2,7 +2,8 @@ import { useEffect } from 'react';
 import {
   SeoToolDefinition,
   getCanonicalToolPath,
-  buildToolJsonLdSchema
+  buildToolJsonLdSchema,
+  buildToolOpenGraphImageUrl
 } from '../data/seoToolsCatalog';
 
 interface SEOHeadProps {
@@ -17,6 +18,7 @@ export default function SEOHead({ tool }: SEOHeadProps) {
         : 'https://devpulse.ai';
     const canonicalPath = getCanonicalToolPath(tool.slug);
     const canonicalUrl = `${origin}${canonicalPath}`;
+    const ogImageUrl = buildToolOpenGraphImageUrl(tool, origin);
 
     // 1. Update Document Title
     document.title = tool.metaTitle;
@@ -32,16 +34,19 @@ export default function SEOHead({ tool }: SEOHeadProps) {
       el.setAttribute('content', content);
     };
 
-    // 2. Meta Description & Social OpenGraph / Twitter Cards
+    // 2. Meta Description, Bing Webmaster Verification & Dynamic Social OpenGraph / Twitter Cards
+    setMetaTag('name', 'msvalidate.01', 'BA4093347487319FB65952C5992D26DB');
     setMetaTag('name', 'description', tool.metaDescription);
     setMetaTag('property', 'og:title', tool.metaTitle);
     setMetaTag('property', 'og:description', tool.metaDescription);
     setMetaTag('property', 'og:type', 'website');
     setMetaTag('property', 'og:url', canonicalUrl);
     setMetaTag('property', 'og:site_name', 'DevPulse AI');
+    setMetaTag('property', 'og:image', ogImageUrl);
     setMetaTag('name', 'twitter:card', 'summary_large_image');
     setMetaTag('name', 'twitter:title', tool.metaTitle);
     setMetaTag('name', 'twitter:description', tool.metaDescription);
+    setMetaTag('name', 'twitter:image', ogImageUrl);
 
     // 3. Canonical Link Tag pointing to dedicated /tools/:slug URL
     let canonicalLink = document.head.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
